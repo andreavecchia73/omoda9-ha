@@ -70,7 +70,15 @@ def check(ctx):
     try:
         ut, tu = wake._bff_login(ctx)
     except Exception as e:
-        return False, f"errore rete: {type(e).__name__}", STATUS_NET_ERROR
+        # Il TIPO da solo non basta: DNS che non risolve, TLS rifiutato, connessione
+        # rifiutata e timeout arrivano spesso come lo stesso nome di classe, e su un primo
+        # login da un paese che nessuno di noi ha provato e' la differenza fra "la tua rete"
+        # e "il nostro endpoint". Il messaggio e' troncato e non contiene credenziali: e'
+        # la descrizione dell'errore di trasporto, non il corpo della risposta.
+        testo = str(e).strip()
+        return (False,
+                f"errore rete: {type(e).__name__}" + (f" - {testo[:160]}" if testo else ""),
+                STATUS_NET_ERROR)
     if ut:
         return True, "Sessione attiva ✅", STATUS_OK
     # Il login è fallito. Ma se è fallito perché il RINNOVO non è nemmeno partito (rete
