@@ -271,8 +271,15 @@ def confirm_otp(ctx, code, emit=lambda m: None):
                   "SMS" if _is_phone(ctx) else "email", r.returncode, out.strip())
     # H7: esito su returncode + sentinella stabile, non su sottostringhe localizzate
     if r.returncode == 0 and "RESULT: OK" in out:
-        ok, _detail, _status = check(ctx)
-        return ok, ("Sessione ripristinata ✅" if ok else "token coniato ma login ancora KO")
+        # Il MOTIVO viene da `check`, che distingue rete / scaduta / rinnovo fallito. Fino al
+        # 26 settembre 2026 qui c'era `_detail` e `_status`, calcolati e buttati via: l'utente
+        # leggeva "token coniato ma login ancora KO" e basta, per ognuna delle tre cause
+        # (issue #62). Il codice OTP a questo punto e' gia' stato ACCETTATO: cio' che fallisce
+        # e' il login al gateway subito dopo, e dirlo cambia cosa la persona prova per prima.
+        ok, dettaglio, stato = check(ctx)
+        if ok:
+            return True, "Sessione ripristinata ✅"
+        return False, f"codice accettato, ma il login al gateway e' fallito: {dettaglio} [{stato}]"
     return False, f"codice rifiutato: {_riga_utile(out, r.returncode)[:120]}"
 
 
@@ -298,8 +305,12 @@ def login_with_password(ctx, password, emit=lambda m: None):
     out = (r.stdout or "") + (r.stderr or "")
     _LOGGER.debug("Omoda9 login: conio token via password rc=%s\n%s", r.returncode, out.strip())
     if r.returncode == 0 and "RESULT: OK" in out:
-        ok, _detail, _status = check(ctx)
-        return ok, ("Sessione ripristinata ✅" if ok else "token coniato ma login ancora KO")
+        # Stessa ragione del ramo OTP: la password e' gia' stata accettata, e senza il motivo
+        # l'utente non ha modo di sapere che il problema sta dopo di lei.
+        ok, dettaglio, stato = check(ctx)
+        if ok:
+            return True, "Sessione ripristinata ✅"
+        return False, f"password accettata, ma il login al gateway e' fallito: {dettaglio} [{stato}]"
     return False, f"password rifiutata: {_riga_utile(out, r.returncode)[:120]}"
 
 
