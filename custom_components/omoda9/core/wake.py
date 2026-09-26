@@ -18,7 +18,7 @@ Flusso (verificato sul codice reale, SESSIONE11_REPORT.md):
 
 Uso strettamente personale (auto/account di Rino). NON pubblicare token/cert.
 """
-import hashlib, os, json, time, threading
+import hashlib, os, json, time, threading, logging
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,6 +28,17 @@ import requests
 from . import omoda_auth as A
 from . import tsp_sign as S
 from . import codes
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def _chiavi(o):
+    """Le CHIAVI di un payload, mai i valori. Un body d'errore dice quasi tutto con la sua
+    forma, e i valori possono portarsi dietro un token o l'identita' dell'account."""
+    if isinstance(o, dict):
+        return "{" + ", ".join(sorted(o)[:12]) + "}"
+    return type(o).__name__
+
 
 # P2-6: VIN, TSP_HOST e il path del token NON sono più global di modulo riscritti prima
 # di ogni chiamata: arrivano dal `CoreCtx` del veicolo (primo argomento di ogni funzione).
@@ -234,6 +245,17 @@ def _bff_login(ctx, _allow_refresh=True):
     try:
         j = r.json()
     except Exception:
+        # Perche' a WARNING e non a DEBUG: fino al 26 settembre 2026 questo ramo era muto e
+        # l'utente riceveva solo "token coniato ma login ancora KO", identico per ogni causa
+        # (issue #62: tre persone in tre paesi, nessun modo di distinguere i casi). Il livello
+        # e' alzato SOLO sui campi che non identificano nessuno: stato HTTP, tipo e lunghezza
+        # del corpo. Il corpo stesso resta a DEBUG, perche' home-assistant.log e' il file che
+        # la gente allega alle issue pubbliche.
+        _LOGGER.warning(
+            "Omoda9 login BFF: HTTP %s con un corpo non-JSON (%s, %d byte). "
+            "Sessione trattata come non valida.",
+            r.status_code, r.headers.get("content-type", "senza content-type"), len(r.content or b""))
+        _LOGGER.debug("Omoda9 login BFF: corpo non-JSON: %s", (r.text or "")[:300])
         return None, None
     d = j.get("data", {}) if isinstance(j, dict) else None
     # P1-3: il gate del refresh sta sull'ASSENZA di userToken, non sul solo `data` non-dict.
@@ -242,6 +264,15 @@ def _bff_login(ctx, _allow_refresh=True):
     # chiedere un OTP quando sarebbe bastato il refresh_token silenzioso.
     ut = d.get("userToken") if isinstance(d, dict) else None
     if not ut:
+        # Stessa ragione del ramo sopra: senza questa riga un 401, un 403, un 424 e un `data`
+        # vuoto arrivano all'utente come la stessa identica frase. `code` e' il codice
+        # d'errore del server, non un dato personale; il `message` resta a DEBUG.
+        _LOGGER.warning(
+            "Omoda9 login BFF: HTTP %s rifiutato, code=%s, nessun userToken (data: %s). "
+            "Rinnovo automatico: %s.",
+            r.status_code, _code_of(j), _chiavi(d),
+            "lo provo" if _allow_refresh else "gia' provato, non ritento")
+        _LOGGER.debug("Omoda9 login BFF: message=%s", str(j.get("message"))[:200] if isinstance(j, dict) else "-")
         # sessione scaduta: prova UN rinnovo automatico del token e ritenta una sola volta
         if _allow_refresh and _refresh_token(ctx):
             return _bff_login(ctx, _allow_refresh=False)
