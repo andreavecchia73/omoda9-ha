@@ -65,6 +65,8 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 
 - **Se l'accesso fallisce dopo che il codice e' stato accettato, adesso ti diciamo dove si e' rotto.** Chi si bloccava al primo accesso leggeva sempre la stessa frase, "token coniato ma login ancora KO", e non aveva modo di capire cosa provare: il codice era sbagliato? l'ora del computer? il PIN? Nessuna delle tre. Quel messaggio vuol dire che **il codice e' stato accettato** e che a fallire e' il passo successivo, il collegamento al server che tiene le tue auto. L'integrazione sapeva gia' distinguere fra un problema di rete, una sessione scaduta e un rinnovo non riuscito, ma buttava via quella informazione un istante prima di scriverla. Adesso la trovi nel messaggio, e nel registro tecnico compare anche la risposta del server. Non e' una riparazione: e' la differenza fra un guasto che si puo' diagnosticare e uno su cui si tira a indovinare. Se sei fra le persone ferme qui, il prossimo tentativo produce finalmente qualcosa da mandarci.
 
+- **Lavoro interno: i nomi delle entita' potranno passare all'inglese senza che la tua installazione se ne accorga.** Non cambia niente per te in questa versione. Finora il nome tecnico di ogni entita' e la sua etichetta tradotta erano ricavati dalla stessa parola italiana, quindi tradurre le etichette avrebbe voluto dire rinominare tutte le entita' - e rinominare un'entita' rompe le automazioni e i grafici di chi la usa. Ora le due cose sono separate: le etichette si possono portare all'inglese lasciando fermi i nomi tecnici, cioe' senza toccare automazioni, dashboard e storico di nessuno.
+
 ### 🇬🇧 English
 
 - **"Petrol range (miles)" now works out for itself which unit the car is speaking.** It is
@@ -121,6 +123,8 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **On an Omoda 9 nothing changes at all.** There the manufacturer's command is authorised and works: when the official route is open we never replace it with an imitation of our own.
 
 - **If the login fails after your code was accepted, we now tell you where it broke.** Anyone stuck at first setup got the same sentence every time, "token minted but login still KO", with no way to tell what to try next: wrong code? clock out of sync? the PIN? None of the three. That message means **the code was accepted** and what fails is the step after it, the connection to the server holding your cars. The integration already knew how to tell a network problem from an expired session from a failed renewal, and threw that away an instant before writing the message. It is in the message now, and the server's own answer goes to the technical log. This is not a repair: it is the difference between a fault you can diagnose and one you guess at. If you are one of the people stuck here, your next attempt finally produces something you can send us.
+
+- **Internal: entity names can move to English without your installation noticing.** Nothing changes for you in this version. Until now an entity's technical id and its translated label were both derived from the same Italian word, so translating the labels would have meant renaming every entity - and renaming an entity breaks the automations and history of whoever uses it. The two are now separate: labels can move to English while the technical ids stay put, which means nobody's automations, dashboards or history are touched.
 
 ## v1.13.0 — 2026-08-10
 
