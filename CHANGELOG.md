@@ -91,6 +91,8 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 
 - **The history recovery now actually moves the history.** The previous attempt tried to clear the shorter series out of the way with the recorder's purge, which does not work: purging deletes the states but leaves the row that blocks the rename, so every single entity failed with `already in use` and the report said it had succeeded. It now moves the shorter history aside under a parked name instead of deleting it, which works and destroys nothing. If you ran the recovery before, run it again.
 
+- **Three sensors that only exist on a battery-electric car kept their old Italian names, and had no translation at all.** Charging power, WLTP range and electric efficiency are created only once the car has confirmed it is battery-only, which happens after the first setup - so they were not present when the renaming table was built, and they were never in the translation files either. They now have English ids like everything else, and a name in every language. If you have them, they are renamed automatically at the next start, and your history follows.
+
 ### 🇮🇹 Italiano
 
 - **«Autonomia benzina (miglia)» ora capisce da sola in che unità parla l'auto.** È un
@@ -163,6 +165,8 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **Il recupero da un'installazione `omoda_jaecoo` adesso porta con se' pure la cronologia degli stati, non solo le statistiche.** Se avevi gia' lanciato il recupero su una beta precedente, rilancialo: riprende quello che era rimasto indietro e non tocca cio' che aveva gia' spostato. La prima volta che ha girato su una migrazione vera, le statistiche a lungo termine sono passate e la cronologia no, per ogni entita' che esisteva gia' col nome nuovo - cioe' tutte, se hai configurato l'integrazione prima di recuperare. I grafici tornavano a luglio, il pannello Cronologia partiva da quella sera. Adesso si spostano entrambe.
 
 - **Il recupero della cronologia adesso la sposta davvero.** Il tentativo precedente cercava di togliere di mezzo la cronologia piu' corta con il purge del recorder, e non funziona: il purge cancella gli stati ma lascia la riga che blocca la rinomina, quindi tutte le entita' fallivano con `already in use` e il rapporto diceva di avercela fatta. Adesso la cronologia corta viene spostata di lato sotto un nome parcheggio invece che cancellata: funziona e non distrugge niente. Se avevi gia' lanciato il recupero, rilancialo.
+
+- **Tre sensori che esistono solo su un'auto elettrica erano rimasti coi vecchi nomi italiani, e non avevano nessuna traduzione.** Potenza di ricarica, autonomia WLTP ed efficienza elettrica nascono solo dopo che l'auto ha confermato di essere solo elettrica, cosa che avviene a configurazione gia' fatta: non c'erano nella tabella dei nomi, e nei file di traduzione non c'erano mai stati. Adesso hanno identificativi inglesi come tutto il resto e un nome in ogni lingua. Se li hai, vengono rinominati da soli al prossimo avvio e lo storico li segue.
 
 ## v1.13.0 — 2026-08-10
 
