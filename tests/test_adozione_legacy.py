@@ -167,3 +167,106 @@ async def test_il_servizio_rifiuta_se_la_vecchia_e_ancora_accesa(
 
     # e non ha toccato niente
     assert registro.async_get("binary_sensor.engine").platform == "omoda_jaecoo"
+
+
+# ──────────── recupero dello storico quando la vecchia e' gia' stata cancellata ────────────
+# E' l'errore che faranno quasi tutti: "rimuovi la vecchia" e' il primo passo che viene in
+# mente, tanto che il documento di migrazione deve scrivere "solo allora" in grassetto.
+# A quel punto `adotta` non ha piu' niente da adottare - ma il recorder non e' stato toccato.
+
+
+def _prese(monkeypatch, serie):
+    """Sostituisce le tre prese sul recorder, che nell'ambiente di test non esiste.
+    Ritorna le liste su cui si accumulano le chiamate."""
+    from custom_components.omoda9 import legacy
+
+    rinominate, cancellate, cronologie = [], [], []
+
+    async def elenco(_hass):
+        return set(serie)
+
+    monkeypatch.setattr(legacy, "_serie_esistenti", elenco)
+    monkeypatch.setattr(legacy, "_rinomina_statistiche",
+                        lambda h, v, n: rinominate.append((v, n)))
+    monkeypatch.setattr(legacy, "_cancella_statistiche",
+                        lambda h, ids: cancellate.extend(ids))
+    monkeypatch.setattr(legacy, "_rinomina_cronologia",
+                        lambda h, v, n: cronologie.append((v, n)))
+    return rinominate, cancellate, cronologie
+
+
+def _dimenticata(hass, registro, config_entry_legacy, piattaforma, suffisso, object_id):
+    v = _vecchia(registro, config_entry_legacy, piattaforma, suffisso, object_id)
+    eid = v.entity_id
+    registro.async_remove(eid)
+    assert registro.async_get(eid) is None
+    return eid
+
+
+async def test_recupera_le_statistiche_di_una_entita_cancellata(
+        hass, registro, entry_nostro, config_entry_legacy, monkeypatch):
+    """La vecchia non esiste piu' nel registro, solo in `deleted_entities`. I suoi dati
+    esistono ancora, e vanno spostati addosso alla nostra, che il nome giusto ce l'ha."""
+    from custom_components.omoda9 import legacy
+
+    vecchio = _dimenticata(hass, registro, config_entry_legacy,
+                           "sensor", "rt_odometro", "omoda_jaecoo_odometer")
+    rinominate, cancellate, cronologie = _prese(monkeypatch, [vecchio])
+
+    r = await legacy.recupera_storico(hass, entry_nostro, dry_run=False)
+
+    assert rinominate == [(vecchio, "sensor.chery_connect_odometer")]
+    assert cronologie == [(vecchio, "sensor.chery_connect_odometer")]
+    assert not cancellate, "non c'era nessuna serie nuova da liberare"
+
+
+async def test_la_serie_nuova_e_corta_lascia_il_posto_a_quella_lunga(
+        hass, registro, entry_nostro, config_entry_legacy, monkeypatch):
+    """Chi ha configurato la nuova prima di accorgersi ha due serie: la sua, di ore, e
+    quella vecchia, di anni. Si libera la corta. E' l'unico punto in cui questa funzione
+    cancella dei dati, e cancella sempre il lato piu' corto."""
+    from custom_components.omoda9 import legacy
+
+    vecchio = _dimenticata(hass, registro, config_entry_legacy,
+                           "sensor", "rt_odometro", "omoda_jaecoo_odometer")
+    nuovo = "sensor.chery_connect_odometer"
+    rinominate, cancellate, _ = _prese(monkeypatch, [vecchio, nuovo])
+
+    await legacy.recupera_storico(hass, entry_nostro, dry_run=False)
+
+    assert cancellate == [nuovo], "la serie corta non e' stata liberata"
+    assert rinominate == [(vecchio, nuovo)]
+
+
+async def test_il_recupero_e_ripetibile(
+        hass, registro, entry_nostro, config_entry_legacy, monkeypatch):
+    """Dopo il primo giro la vecchia serie non esiste piu': e' stata rinominata. Un secondo
+    giro non deve rifare niente, e soprattutto non deve CANCELLARE la serie appena
+    recuperata scambiandola per la gemella corta di turno. Un recupero che si mangia il
+    proprio risultato al secondo lancio e' peggio di nessun recupero."""
+    from custom_components.omoda9 import legacy
+
+    _dimenticata(hass, registro, config_entry_legacy,
+                 "sensor", "rt_odometro", "omoda_jaecoo_odometer")
+    rinominate, cancellate, _ = _prese(monkeypatch, ["sensor.chery_connect_odometer"])
+
+    r = await legacy.recupera_storico(hass, entry_nostro, dry_run=False)
+
+    assert not rinominate, "ha rifatto un lavoro gia' fatto"
+    assert not cancellate, "ha cancellato la serie che aveva appena recuperato"
+    assert not r["statistiche"]
+
+
+async def test_dry_run_del_recupero_non_scrive(
+        hass, registro, entry_nostro, config_entry_legacy, monkeypatch):
+    """Su una funzione che tocca lo storico della gente, far vedere prima e' il minimo."""
+    from custom_components.omoda9 import legacy
+
+    vecchio = _dimenticata(hass, registro, config_entry_legacy,
+                           "sensor", "rt_odometro", "omoda_jaecoo_odometer")
+    rinominate, cancellate, cronologie = _prese(monkeypatch, [vecchio])
+
+    r = await legacy.recupera_storico(hass, entry_nostro, dry_run=True)
+
+    assert r["statistiche"] == [(vecchio, "sensor.chery_connect_odometer")]
+    assert not rinominate and not cancellate and not cronologie, "il dry run ha scritto"

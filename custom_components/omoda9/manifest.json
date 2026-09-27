@@ -1,6 +1,9 @@
 {
   "domain": "omoda9",
   "name": "Chery Connect",
+  "after_dependencies": [
+    "recorder"
+  ],
   "codeowners": [
     "@Caslinovich"
   ],
