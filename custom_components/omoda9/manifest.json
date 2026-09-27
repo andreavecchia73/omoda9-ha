@@ -1,9 +1,13 @@
 {
   "domain": "omoda9",
-  "name": "Omoda 9 / Jaecoo",
-  "codeowners": ["@Caslinovich"],
+  "name": "Chery Connect",
+  "codeowners": [
+    "@Caslinovich"
+  ],
   "config_flow": true,
-  "dependencies": ["http"],
+  "dependencies": [
+    "http"
+  ],
   "documentation": "https://github.com/chery-connect-ha/omoda9-ha",
   "integration_type": "device",
   "iot_class": "cloud_push",

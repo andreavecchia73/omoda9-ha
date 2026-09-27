@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Omoda 9 / Jaecoo",
+        "title": "Chery Connect",
         "description": "Kies hoe u zich aanmeldt bij uw Omoda/Jaecoo-account. Gebruik de telefoonoptie als uw account is geregistreerd met een telefoonnummer in plaats van een e-mail.",
         "menu_options": {
           "login_email": "Aanmelden met e-mail",
@@ -64,7 +64,7 @@
         }
       },
       "reauth_confirm": {
-        "title": "Opnieuw verifiëren Omoda 9 / Jaecoo",
+        "title": "Opnieuw verifiëren Chery Connect",
         "description": "De sessie is verlopen: totdat u opnieuw geverifieerd bent, kan de integratie niet met de auto communiceren en blijven commando's en sensoren vaststaan.\n\n**Er is geen code automatisch verzonden.** Kies hoe u wilt doorgaan of voer een bestaande code in.",
         "menu_options": {
           "send_code": "Stuur me een nieuwe code",

@@ -85,6 +85,11 @@ CONF_VEHICLE_NAME = "vehicle_name"
 DATA_VEHICLE_MODEL = "vehicle_model"
 DATA_VEHICLE_BRAND = "vehicle_brand"
 # fallback quando il modello non è (ancora) noto
+# Ripiego del nome del DISPOSITIVO, cioe' dell'AUTO - non dell'integrazione. Di norma
+# arriva il nome vero dal backend (Omoda 9, Jaecoo 7...) e questo non si vede mai. Resta
+# il nome di un'auto di proposito: l'integrazione si chiama "Chery Connect" (manifest), il
+# dispositivo e' la macchina. Chiamare "Chery Connect" anche la vettura farebbe comparire
+# un'auto col nome del software.
 DEFAULT_VEHICLE_NAME = "Omoda 9 / Jaecoo"
 
 # ── Capability per-veicolo (dalla stessa risposta `queryList` dell'identità) ──────────────
