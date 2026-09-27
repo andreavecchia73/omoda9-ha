@@ -12,8 +12,12 @@ One file per car, produced by Home Assistant, not written by hand.
    something in it you would rather not publish, stop and say so on
    [the discussion](https://github.com/chery-connect-ha/omoda9-ha/discussions/82)
    instead.
-3. Rename it `<brand>-<model>-<region>.json`, lowercase, for example
-   `omoda-omoda-5-ev-it.json`.
+3. **Rename it** `<brand>-<model>-<region>.json`, lowercase, for example
+   `omoda-omoda-5-ev-it.json`. This is not tidiness: the diagnostics redacts
+   what is *inside* the file and nothing checks what the file is *called*, and a
+   committed filename is in the git history exactly like its contents. CI
+   refuses a name carrying a VIN or an email address, but renaming it yourself
+   is the point at which you look.
 4. Open a pull request with it in this directory.
 
 CI validates it. If something is wrong the check says what, in words.

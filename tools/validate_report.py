@@ -51,6 +51,19 @@ def _id_solo_termico() -> set[str]:
 def valida(percorso: Path) -> list[str]:
     """Ritorna l'elenco dei problemi. Vuoto = il rapporto passa."""
     problemi: list[str] = []
+
+    # 0. IL NOME DEL FILE. Il controllo sul contenuto da solo e' monco, e ce lo ha fatto
+    # notare un tester prima che costasse a qualcuno: la diagnostica redige quello che c'e'
+    # DENTRO, e nessuno guarda come si chiama il file. Chi lo rinomina a mano - o una
+    # versione di Home Assistant che componga il nome diversamente - puo' scriverci un VIN
+    # accanto a un contenuto perfettamente pulito. E il nome di un file committato sta nella
+    # storia di git esattamente come il suo contenuto.
+    if VIN.search(percorso.name) or EMAIL.search(percorso.name):
+        problemi.append(
+            f"ha un identificativo nel NOME del file ({percorso.name}). Il contenuto puo' "
+            "essere pulito e il nome no: rinominalo come dice reports/README.md, "
+            "`<marca>-<modello>-<regione>.json`.")
+
     testo = percorso.read_text(encoding="utf-8")
 
     # 1. Anti-fuga. Prima di tutto il resto: protegge chi ha caricato il file.
@@ -67,7 +80,15 @@ def valida(percorso: Path) -> list[str]:
     except json.JSONDecodeError as err:
         return problemi + [f"non e' JSON valido: {err}"]
 
+    # Home Assistant INCAPSULA la diagnostica dell'integrazione sotto `data`, insieme alla
+    # sua (versione di HA, manifest, tempi di avvio). Il file che l'utente scarica e' quello
+    # incapsulato; quello che l'integrazione produce e' il contenuto. Si accettano entrambe
+    # le forme, perche' un rapporto puo' arrivare gia' estratto - e perche' cercare solo la
+    # radice ha respinto il primo rapporto vero dicendo che serviva una versione piu' nuova,
+    # che era falso e mandava la persona a rifare una cosa fatta bene.
     v = d.get("vehicle")
+    if not isinstance(v, dict) and isinstance(d.get("data"), dict):
+        v = d["data"].get("vehicle")
     if not isinstance(v, dict):
         return problemi + [
             "non ha la sezione `vehicle`. Serve una diagnostica di v1.14.0-beta.10 o "
@@ -115,13 +136,21 @@ def main(argv: list[str]) -> int:
     rotti = 0
     for f in file:
         problemi = valida(f)
+        # Path relativa quando si puo', assoluta quando no: questo script si usa anche a
+        # mano su un file appena scaricato, fuori dal repository, ed e' proprio il momento
+        # in cui serve di piu'. Prima esplodeva li', mentre stampava un problema - cioe'
+        # nascondeva il problema che aveva appena trovato.
+        try:
+            dove = f.relative_to(RADICE)
+        except ValueError:
+            dove = f
         if problemi:
             rotti += 1
-            print(f"::error file={f.relative_to(RADICE)}::{f.name}: " + problemi[0])
+            print(f"::error file={dove}::{f.name}: " + problemi[0])
             for p in problemi:
                 print(f"  - {p}")
         else:
-            print(f"ok  {f.relative_to(RADICE)}")
+            print(f"ok  {dove}")
     return 1 if rotti else 0
 
 
