@@ -288,6 +288,25 @@ def _rinomina_cronologia(hass, vecchio: str, nuovo: str) -> None:
     get_instance(hass).async_update_states_metadata(vecchio, new_entity_id=nuovo)
 
 
+async def _ha_cronologia(hass, entity_id: str) -> bool:
+    """Se di questa entita' il recorder ha ancora almeno uno stato registrato."""
+    from homeassistant.components.recorder import get_instance
+    from homeassistant.components.recorder.history import get_last_state_changes
+    righe = await get_instance(hass).async_add_executor_job(
+        get_last_state_changes, hass, 1, entity_id)
+    return bool(righe.get(entity_id))
+
+
+async def _libera_cronologia(hass, entity_id: str) -> None:
+    """Toglie dal recorder la cronologia di un'entita', per fare posto a una piu' lunga.
+
+    Passa dal servizio `recorder.purge_entities` invece di toccare le tabelle: e' la strada
+    che il recorder offre, prende i suoi lock e sa in che ordine cancellare."""
+    await hass.services.async_call(
+        "recorder", "purge_entities",
+        {"entity_id": [entity_id], "keep_days": 0}, blocking=True)
+
+
 async def recupera_storico(hass, entry, *, dry_run: bool = True) -> dict:
     """Recupera i DATI della linea `omoda_jaecoo` quando le sue entita' non ci sono piu'.
 
@@ -357,10 +376,26 @@ async def recupera_storico(hass, entry, *, dry_run: bool = True) -> dict:
                 _rinomina_statistiche(hass, morta.entity_id, nuovo_id)
             rapporto["statistiche"].append((morta.entity_id, nuovo_id))
 
-        # CRONOLOGIA degli stati. Non passa dalle stesse tabelle e si perde per conto suo,
-        # quindi si tratta a parte: un'entita' puo' avere l'una senza l'altra.
-        if not dry_run:
-            _rinomina_cronologia(hass, morta.entity_id, nuovo_id)
-        rapporto["cronologia"].append((morta.entity_id, nuovo_id))
+        # CRONOLOGIA degli stati. Non passa dalle stesse tabelle delle statistiche e si
+        # perde per conto suo, quindi si tratta a parte: un'entita' puo' avere l'una senza
+        # l'altra.
+        #
+        # Questo ramo il 27 settembre 2026 non aveva la disciplina che ha quello sopra, e
+        # il risultato si e' visto al primo uso su un'istanza vera: trenta entita' con le
+        # statistiche da luglio e la cronologia da quella sera. Il recorder, quando il
+        # nome di destinazione e' gia' occupato, scrive "Cannot migrate history ... already
+        # in use" e lascia tutto com'era - senza eccezioni e senza test rossi.
+        #
+        # Le due condizioni sotto non sono simmetria per eleganza. La prima evita di
+        # lavorare a vuoto; la SECONDA e' quella che conta, perche' senza di lei un secondo
+        # lancio purgherebbe la cronologia appena recuperata scambiandola per la gemella
+        # corta di turno. Un recupero che si mangia il proprio risultato e' peggio di
+        # nessun recupero.
+        if await _ha_cronologia(hass, morta.entity_id):
+            if not dry_run:
+                if await _ha_cronologia(hass, nuovo_id):
+                    await _libera_cronologia(hass, nuovo_id)
+                _rinomina_cronologia(hass, morta.entity_id, nuovo_id)
+            rapporto["cronologia"].append((morta.entity_id, nuovo_id))
 
     return rapporto
