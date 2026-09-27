@@ -123,10 +123,29 @@ async def _async_migrate_entity_ids(hass: HomeAssistant, entry: ConfigEntry) -> 
         esistenti.discard(voce.entity_id)
         esistenti.add(nuovo)
         fatti += 1
-    if fatti:
-        _LOGGER.info(
-            "Omoda9: %d entita' rinominate ai nomi inglesi. Storico e statistiche seguono; "
-            "i riferimenti scritti a mano in automazioni e dashboard vanno aggiornati.", fatti)
+    if not fatti:
+        return
+    _LOGGER.info(
+        "Omoda9: %d entita' rinominate ai nomi inglesi. Storico e statistiche seguono; "
+        "i riferimenti scritti a mano in automazioni e dashboard vanno aggiornati.", fatti)
+
+    # Un elenco dentro un file del repository non lo apre nessuno, e la domanda che l'utente
+    # si fa e' "quali sono le mie?". Home Assistant ha il posto giusto per rispondere: un
+    # avviso di riparazione, che compare in Impostazioni e resta finche' non lo si chiude.
+    # Non e' "fixabile" perche' non c'e' niente che possiamo riparare al posto suo: le sue
+    # automazioni le conosce solo lui. Serve a dire COSA e' successo e DOVE guardare.
+    from homeassistant.helpers import issue_registry as ir
+    ir.async_create_issue(
+        hass, DOMAIN, f"entity_ids_rinominati_{entry.entry_id}",
+        is_fixable=False,
+        severity=ir.IssueSeverity.WARNING,
+        translation_key="entity_ids_renamed",
+        translation_placeholders={
+            "count": str(fatti),
+            "url": ("https://github.com/chery-connect-ha/omoda9-ha/blob/master/"
+                    "docs/entity-id-rename.md"),
+        },
+    )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

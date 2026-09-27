@@ -184,6 +184,10 @@
           "entry_not_found": "Integration not found — reload Home Assistant and try again."
         }
       }
+    },
+    "entity_ids_renamed": {
+      "title": "Omoda 9: {count} entities were renamed",
+      "description": "The entity ids of this integration moved from Italian to English: `sensor.omoda9_batteria` is now `sensor.chery_connect_battery`, and {count} entities on this vehicle were renamed.\n\n**Your history came with them.** Graphs, long-term statistics and the energy dashboard followed the rename automatically. There is nothing to reinstall and nothing to log in to again.\n\n**What did not follow: names you typed yourself.** Automations, scripts, template sensors and dashboard cards that refer to an entity by name still point at the old one. Home Assistant shows those as unknown entities.\n\nWhere to look: Settings, Automations and scenes, then any automation flagged with an unknown entity. The full old-to-new list is here: {url}\n\nDismiss this notice once you have been through them."
     }
   },
   "options": {

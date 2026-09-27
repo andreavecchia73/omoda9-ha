@@ -184,6 +184,10 @@
           "entry_not_found": "Integrazione non trovata — ricarica Home Assistant e riprova."
         }
       }
+    },
+    "entity_ids_renamed": {
+      "title": "Omoda 9: {count} entita' rinominate",
+      "description": "Gli identificativi delle entita' di questa integrazione sono passati dall'italiano all'inglese: `sensor.omoda9_batteria` adesso e' `sensor.chery_connect_battery`, e su questo veicolo sono state rinominate {count} entita'.\n\n**Il tuo storico e' venuto dietro.** Grafici, statistiche a lungo termine e dashboard Energia hanno seguito il cambio da soli. Non c'e' niente da reinstallare e nessun accesso da rifare.\n\n**Quello che non ha seguito: i nomi che hai scritto tu.** Automazioni, script, sensori template e schede della dashboard che nominano un'entita' puntano ancora al vecchio nome. Home Assistant te li segnala come entita' sconosciute.\n\nDove guardare: Impostazioni, Automazioni e scene, e poi ogni automazione segnalata con un'entita' sconosciuta. L'elenco completo vecchio-nuovo e' qui: {url}\n\nChiudi questo avviso quando le hai sistemate."
     }
   },
   "options": {

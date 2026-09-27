@@ -89,3 +89,32 @@ async def test_una_entita_fuori_tabella_resta_com_e(hass, config_entry, registro
     await _migra(hass, config_entry)
 
     assert registro.async_get("sensor.omoda9_cosa_sconosciuta") is not None
+
+
+async def test_avvisa_l_utente_solo_se_ha_rinominato_qualcosa(hass, config_entry, registro):
+    """L'elenco in un file non lo apre nessuno, e la domanda che l'utente si fa e' "quali
+    sono le MIE?". L'avviso di riparazione e' il posto dove Home Assistant risponde.
+
+    E non deve comparire a vuoto: chi installa da zero non ha niente da sistemare, e un
+    avviso che compare quando non c'e' nulla da fare insegna a ignorare anche quelli veri."""
+    from homeassistant.helpers import issue_registry as ir
+
+    from custom_components.omoda9.const import DOMAIN
+
+    reg_issue = ir.async_get(hass)
+    issue_id = f"entity_ids_rinominati_{config_entry.entry_id}"
+
+    # installazione nuova: nessuna entita' col vecchio nome -> nessun avviso
+    await _migra(hass, config_entry)
+    assert reg_issue.async_get_issue(DOMAIN, issue_id) is None
+
+    # installazione che viene da prima -> avviso, col numero giusto
+    registro.async_get_or_create(
+        "sensor", "omoda9", "VINFINTO_batteria",
+        suggested_object_id="omoda9_batteria", config_entry=config_entry)
+    await _migra(hass, config_entry)
+
+    avviso = reg_issue.async_get_issue(DOMAIN, issue_id)
+    assert avviso is not None, "l'utente non viene avvisato del rename"
+    assert avviso.translation_placeholders["count"] == "1"
+    assert not avviso.is_fixable, "non c'e' niente che possiamo riparare al posto suo"
