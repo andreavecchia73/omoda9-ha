@@ -74,9 +74,68 @@ async def _async_register_card(hass: HomeAssistant) -> None:
 # Effetto collaterale utile: i logger dei moduli core/ ora rispondono a `manifest.loggers`.
 
 
+async def _async_migrate_entity_ids(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Porta gli entity_id gia' registrati ai nomi inglesi, una volta sola e in silenzio.
+
+    Perche' serve, e perche' il codice da solo non basta. Home Assistant ritrova un'entita'
+    dal suo `unique_id` e riusa l'`entity_id` che ha gia' in registro: l'`entity_id` che il
+    codice calcola vale solo alla PRIMA registrazione. Senza questa funzione chi e' gia'
+    installato terrebbe `sensor.omoda9_batteria` per sempre e solo le installazioni nuove
+    avrebbero i nomi inglesi - il peggiore dei due mondi, perche' una issue aperta da due
+    utenti diversi parlerebbe di due entita' con nomi diversi.
+
+    Cosa NON si perde: lo storico. Rinominando attraverso il registro, il recorder sposta da
+    solo le statistiche a lungo termine e la cronologia degli stati (vedi
+    `recorder/entity_registry.py`). Grafici e dashboard Energia continuano.
+
+    Cosa si perde comunque, e nessuna migrazione puo' evitarlo: i riferimenti scritti a mano
+    in automazioni, script e dashboard. Sono elencati nelle note di rilascio con la tabella
+    vecchio -> nuovo.
+
+    L'unico modo in cui il recorder fallisce e' silenzioso: se l'`entity_id` di destinazione
+    esiste gia', logga "Cannot migrate history ... already in use" e lo storico resta
+    indietro. Per questo qui si salta invece di sovrascrivere, e lo si dice a WARNING.
+    """
+    from homeassistant.helpers import entity_registry as er
+
+    from .naming import ENGLISH_KEYS, ID_PREFIX
+
+    reg = er.async_get(hass)
+    esistenti = {e.entity_id for e in reg.entities.values()}
+    fatti = 0
+    for voce in er.async_entries_for_config_entry(reg, entry.entry_id):
+        piattaforma, _, object_id = voce.entity_id.partition(".")
+        if not object_id.startswith(f"{DOMAIN}_"):
+            continue
+        inglese = ENGLISH_KEYS.get(object_id[len(DOMAIN) + 1:])
+        if inglese is None:
+            continue
+        nuovo = f"{piattaforma}.{ID_PREFIX}_{inglese}"
+        if nuovo == voce.entity_id:
+            continue
+        if nuovo in esistenti:
+            _LOGGER.warning(
+                "Omoda9: %s non rinominata in %s perche' quel nome e' gia' in uso. "
+                "Lo storico resterebbe indietro, quindi non si tocca niente.",
+                voce.entity_id, nuovo)
+            continue
+        reg.async_update_entity(voce.entity_id, new_entity_id=nuovo)
+        esistenti.discard(voce.entity_id)
+        esistenti.add(nuovo)
+        fatti += 1
+    if fatti:
+        _LOGGER.info(
+            "Omoda9: %d entita' rinominate ai nomi inglesi. Storico e statistiche seguono; "
+            "i riferimenti scritti a mano in automazioni e dashboard vanno aggiornati.", fatti)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Inizializza l'integrazione da un config entry."""
     from .coordinator import Omoda9Coordinator
+
+    # PRIMA di costruire qualunque entita': il rename tocca il registro, e il registro va
+    # sistemato mentre nessuna entita' e' ancora montata.
+    await _async_migrate_entity_ids(hass, entry)
 
     coordinator = Omoda9Coordinator(hass, entry)
 

@@ -16,6 +16,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 
+from .naming import ENGLISH_KEYS, ID_PREFIX
 from .const import DEFAULT_VEHICLE_NAME, DOMAIN, OPT_MAX_S
 from .coordinator import Omoda9Coordinator
 
@@ -143,8 +144,18 @@ class Omoda9Entity(CoordinatorEntity[Omoda9Coordinator]):
         # muova, e chi e' installato non vede cambiare niente tranne il nome mostrato.
         # Il ripiego resta la derivazione di prima, cosi' le entita' non ancora convertite
         # continuano a funzionare identiche e la conversione si fa una piattaforma per volta.
-        self._attr_translation_key = translation_key or (
+        derivata = translation_key or (
             oid[len(DOMAIN) + 1:] if oid.startswith(f"{DOMAIN}_") else oid)
+        # Passaggio all'inglese, per chiave e per entity_id insieme. Una chiave presente in
+        # ENGLISH_KEYS vince su tutto, incluso un object_id scritto a mano: e' l'unico modo
+        # perche' la conversione sia completa invece che a macchie. Chi NON e' in tabella
+        # resta esattamente com'era - una entita' nuova aggiunta domani funziona senza
+        # sapere che questa tabella esiste, e poi ci entra quando la si traduce.
+        inglese = ENGLISH_KEYS.get(derivata)
+        if inglese is not None:
+            derivata = inglese
+            oid = f"{ID_PREFIX}_{inglese}"
+        self._attr_translation_key = derivata
         # entity_id ESPLICITO = continuità col bridge (default = slugify(name)).
         if entity_id_format:
             self.entity_id = entity_id_format.format(oid)
