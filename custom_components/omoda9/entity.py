@@ -123,6 +123,7 @@ class Omoda9Entity(CoordinatorEntity[Omoda9Coordinator]):
         *,
         object_id: str | None = None,
         entity_id_format: str | None = None,
+        translation_key: str | None = None,
     ) -> None:
         super().__init__(coordinator)
         # `name` NON è più il friendly name (lo dà translation_key): lo teniamo solo per
@@ -131,8 +132,19 @@ class Omoda9Entity(CoordinatorEntity[Omoda9Coordinator]):
         self._raw_name = name
         self._attr_unique_id = f"{coordinator.vin}_{unique_suffix}"
         oid = object_id or slugify(name)          # es. "omoda9_batteria"
-        # translation_key = object_id senza il prefisso dominio → chiave in translations/*.json
-        self._attr_translation_key = oid[len(DOMAIN) + 1:] if oid.startswith(f"{DOMAIN}_") else oid
+        # La chiave di traduzione si DICHIARA. Fino a qui era derivata da `oid`, cioe' dallo
+        # stesso `name` italiano da cui si costruisce l'entity_id: chiave ed entity_id erano
+        # la stessa stringa scritta una volta. La conseguenza non era ovvia e ci e' costata
+        # tre settimane di pianificazione: portare le chiavi in inglese sembrava richiedere
+        # di muovere ogni entity_id, quindi sembrava potersi fare SOLO nella release del
+        # cambio di dominio - l'unico momento in cui gli entity_id si rigenerano comunque.
+        # Non e' un vincolo di Home Assistant, era questa riga. Dichiarandola, le due cose
+        # si separano: la chiave puo' diventare inglese senza che nessun entity_id si
+        # muova, e chi e' installato non vede cambiare niente tranne il nome mostrato.
+        # Il ripiego resta la derivazione di prima, cosi' le entita' non ancora convertite
+        # continuano a funzionare identiche e la conversione si fa una piattaforma per volta.
+        self._attr_translation_key = translation_key or (
+            oid[len(DOMAIN) + 1:] if oid.startswith(f"{DOMAIN}_") else oid)
         # entity_id ESPLICITO = continuità col bridge (default = slugify(name)).
         if entity_id_format:
             self.entity_id = entity_id_format.format(oid)
