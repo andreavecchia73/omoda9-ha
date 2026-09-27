@@ -201,11 +201,12 @@ def _prese(monkeypatch, serie, cronologie_esistenti=None):
     async def ha(_hass, eid):
         return eid in esistenti
 
-    async def libera(_hass, eid):
+    def sposta(_hass, eid):
         liberate.append(eid)
+        return f"{eid}_superseded"
 
     monkeypatch.setattr(legacy, "_ha_cronologia", ha)
-    monkeypatch.setattr(legacy, "_libera_cronologia", libera)
+    monkeypatch.setattr(legacy, "_sposta_di_lato", sposta)
     return rinominate, cancellate, cronologie, liberate
 
 
@@ -306,7 +307,7 @@ async def test_la_cronologia_libera_il_posto_come_le_statistiche(
 
     await legacy.recupera_storico(hass, entry_nostro, dry_run=False)
 
-    assert liberate == [nuovo], "la cronologia corta non e' stata liberata"
+    assert liberate == [nuovo], "la cronologia corta non e' stata spostata di lato"
     assert cronologie == [(vecchio, nuovo)], "la cronologia non e' stata spostata"
 
 
@@ -329,7 +330,7 @@ async def test_il_secondo_lancio_non_purga_la_cronologia_appena_recuperata(
 
     r = await legacy.recupera_storico(hass, entry_nostro, dry_run=False)
 
-    assert not liberate, "ha purgato la cronologia che aveva appena recuperato"
+    assert not liberate, "ha spostato via la cronologia che aveva appena recuperato"
     assert not cronologie, "ha rifatto un lavoro gia' fatto"
     assert not r["cronologia"]
 
@@ -348,3 +349,20 @@ async def test_il_dry_run_non_purga_e_non_rinomina_la_cronologia(
 
     assert not liberate and not cronologie, "il dry run ha toccato la cronologia"
     assert r["cronologia"] == [(vecchio, nuovo)], "il dry run non ha riportato cosa farebbe"
+
+
+def test_il_nome_di_parcheggio_non_collide_con_niente(hass):
+    """Lo spostamento di lato inventa un nome, e un nome inventato male e' il modo in cui
+    questa funzione potrebbe mangiarsi dei dati al giro dopo. Deve stare fuori da cio' che
+    l'integrazione produce, altrimenti un secondo giro lo scambierebbe per un candidato."""
+    from custom_components.omoda9 import legacy
+    from custom_components.omoda9.legacy import CANON_ENTITY_ID
+
+    visti = []
+    legacy._rinomina_cronologia = lambda h, v, n: visti.append((v, n))
+    parcheggio = legacy._sposta_di_lato(hass, "sensor.chery_connect_odometer")
+
+    assert parcheggio == "sensor.chery_connect_odometer_superseded"
+    assert visti == [("sensor.chery_connect_odometer", parcheggio)]
+    assert parcheggio not in set(CANON_ENTITY_ID.values()), \
+        "il nome di parcheggio e' un entity_id che l'integrazione produce"

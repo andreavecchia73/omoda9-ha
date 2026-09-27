@@ -89,6 +89,8 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 
 - **Recovering from an `omoda_jaecoo` installation now brings the state history too, not only the statistics.** If you already ran the recovery on an earlier beta, run it again: it will pick up what was left behind, and it will not touch what it already moved. The first time this ran on a real migration, the long-term statistics came across and the state history did not, for every entity that already existed under its new name - which is every entity, if you set up the integration before recovering. Graphs went back to July, the history panel started that evening. Both now move.
 
+- **The history recovery now actually moves the history.** The previous attempt tried to clear the shorter series out of the way with the recorder's purge, which does not work: purging deletes the states but leaves the row that blocks the rename, so every single entity failed with `already in use` and the report said it had succeeded. It now moves the shorter history aside under a parked name instead of deleting it, which works and destroys nothing. If you ran the recovery before, run it again.
+
 ### 🇮🇹 Italiano
 
 - **«Autonomia benzina (miglia)» ora capisce da sola in che unità parla l'auto.** È un
@@ -159,6 +161,8 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **Hai gia' cancellato la vecchia integrazione `omoda_jaecoo`? Il tuo storico e' ancora li'.** Togliere un'integrazione elimina le sue entita' dal registro di Home Assistant; **non** elimina i dati. Statistiche a lungo termine e cronologia restano nel database, orfane ma intatte, e Home Assistant ricorda ancora tutte le entita' che ha tolto. Adesso c'e' un'azione apposta: **Recupera lo storico da un'installazione omoda_jaecoo rimossa** (Strumenti per sviluppatori, Azioni), che sposta statistiche e cronologia sulle entita' di questa integrazione. Niente da reinstallare, e la vecchia integrazione non serve che esista piu'. Lanciala prima con *dry run* acceso. Un avvertimento sui tempi: il recorder prima o poi ripulisce i dati orfani, quindi si parla di giorni, non di sempre.
 
 - **Il recupero da un'installazione `omoda_jaecoo` adesso porta con se' pure la cronologia degli stati, non solo le statistiche.** Se avevi gia' lanciato il recupero su una beta precedente, rilancialo: riprende quello che era rimasto indietro e non tocca cio' che aveva gia' spostato. La prima volta che ha girato su una migrazione vera, le statistiche a lungo termine sono passate e la cronologia no, per ogni entita' che esisteva gia' col nome nuovo - cioe' tutte, se hai configurato l'integrazione prima di recuperare. I grafici tornavano a luglio, il pannello Cronologia partiva da quella sera. Adesso si spostano entrambe.
+
+- **Il recupero della cronologia adesso la sposta davvero.** Il tentativo precedente cercava di togliere di mezzo la cronologia piu' corta con il purge del recorder, e non funziona: il purge cancella gli stati ma lascia la riga che blocca la rinomina, quindi tutte le entita' fallivano con `already in use` e il rapporto diceva di avercela fatta. Adesso la cronologia corta viene spostata di lato sotto un nome parcheggio invece che cancellata: funziona e non distrugge niente. Se avevi gia' lanciato il recupero, rilancialo.
 
 ## v1.13.0 — 2026-08-10
 

@@ -297,14 +297,28 @@ async def _ha_cronologia(hass, entity_id: str) -> bool:
     return bool(righe.get(entity_id))
 
 
-async def _libera_cronologia(hass, entity_id: str) -> None:
-    """Toglie dal recorder la cronologia di un'entita', per fare posto a una piu' lunga.
+def _sposta_di_lato(hass, entity_id: str) -> str:
+    """Toglie di mezzo la cronologia corta spostandola su un nome libero, invece di
+    cancellarla.
 
-    Passa dal servizio `recorder.purge_entities` invece di toccare le tabelle: e' la strada
-    che il recorder offre, prende i suoi lock e sa in che ordine cancellare."""
-    await hass.services.async_call(
-        "recorder", "purge_entities",
-        {"entity_id": [entity_id], "keep_days": 0}, blocking=True)
+    Prima di qui si provava con `recorder.purge_entities`, e NON funziona: quel servizio
+    mette in coda un compito e cancella gli STATI, ma la riga in `states_meta` resta - ed e'
+    quella che blocca la rinomina. Misurato il 27 settembre 2026 su un'istanza vera: 96
+    righe `Cannot migrate history ... because the new entity_id is already in use`, tutte
+    dopo un purge che era andato a buon fine.
+
+    Spostare di lato riesce dove cancellare fallisce, e ha due vantaggi sopra la cancellazione:
+    la cronologia corta non viene distrutta ma solo archiviata sotto un nome che nessuno
+    guarda, e l'operazione usa la stessa identica API della rinomina, quindi o riescono
+    entrambe o non si e' rotto niente.
+
+    Il nome di parcheggio non puo' collidere con niente: non e' un entity_id che questa
+    integrazione produca, e non e' in `deleted_entities`, quindi un secondo giro non lo
+    scambia per un candidato."""
+    dominio, _, oggetto = entity_id.partition(".")
+    parcheggio = f"{dominio}.{oggetto}_superseded"
+    _rinomina_cronologia(hass, entity_id, parcheggio)
+    return parcheggio
 
 
 async def recupera_storico(hass, entry, *, dry_run: bool = True) -> dict:
@@ -394,7 +408,7 @@ async def recupera_storico(hass, entry, *, dry_run: bool = True) -> dict:
         if await _ha_cronologia(hass, morta.entity_id):
             if not dry_run:
                 if await _ha_cronologia(hass, nuovo_id):
-                    await _libera_cronologia(hass, nuovo_id)
+                    _sposta_di_lato(hass, nuovo_id)
                 _rinomina_cronologia(hass, morta.entity_id, nuovo_id)
             rapporto["cronologia"].append((morta.entity_id, nuovo_id))
 
