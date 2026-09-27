@@ -1,0 +1,15 @@
+adopt_legacy_entities:
+  name: Adopt entities from the omoda_jaecoo installation
+  description: >-
+    Takes over the entities of an older omoda_jaecoo installation, with their
+    history. Home Assistant treats that line as a different integration, so
+    without this you get new empty entities while years of history stay attached
+    to something you are about to remove. Disable the old integration first.
+  fields:
+    dry_run:
+      name: Dry run
+      description: >-
+        Report what would happen and change nothing. Run this first.
+      default: true
+      selector:
+        boolean:

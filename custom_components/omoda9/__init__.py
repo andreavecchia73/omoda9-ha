@@ -13,9 +13,9 @@ from __future__ import annotations
 import logging
 import os
 
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
 
 from .const import DOMAIN, PLATFORMS
 
@@ -72,6 +72,47 @@ async def _async_register_card(hass: HomeAssistant) -> None:
 #     HACS invalida la cache da sé (i .pyc sono indicizzati per percorso completo).
 #
 # Effetto collaterale utile: i logger dei moduli core/ ora rispondono a `manifest.loggers`.
+
+
+async def _async_register_adoption_service(hass: HomeAssistant) -> None:
+    """Registra il servizio di adozione delle entita' della linea `omoda_jaecoo`.
+
+    E' un SERVIZIO e non un passo automatico del setup, di proposito. Un'integrazione che
+    si prende le entita' di un'altra senza che nessuno l'abbia chiesto e' inaccettabile
+    anche quando ha ragione, e questa gira su un'API che nessuna delle 1401 integrazioni di
+    serie usa. Lo deve chiedere una persona, sapendo cosa comporta.
+    """
+    from .legacy import LEGACY_DOMAIN, adotta
+
+    if hass.services.has_service(DOMAIN, "adopt_legacy_entities"):
+        return
+
+    async def _esegui(call) -> None:
+        dry = call.data.get("dry_run", True)
+        # L'integrazione vecchia deve essere SCARICATA: Home Assistant rifiuta di spostare
+        # un'entita' gia' montata ("Only entities that haven't been loaded can be migrated").
+        # Meglio dirlo prima che fallire cinquanta volte di fila.
+        caricate = [e for e in hass.config_entries.async_entries(LEGACY_DOMAIN)
+                    if e.state == ConfigEntryState.LOADED]
+        if caricate:
+            raise HomeAssistantError(
+                f"L'integrazione {LEGACY_DOMAIN} e' ancora attiva. Disattivala "
+                "(Impostazioni, Dispositivi e servizi, menu della vecchia, Disattiva), "
+                "poi rilancia questo servizio.")
+
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            rapporto = await hass.async_add_executor_job(adotta, hass, entry, dry)
+            _LOGGER.warning(
+                "Omoda9 adozione%s: %d adottate, %d sostituite, %d non migrabili, %d saltate",
+                " (prova a vuoto)" if dry else "",
+                len(rapporto["adottate"]), rapporto["sostituite"],
+                len(rapporto["non_migrabili"]), len(rapporto["saltate"]))
+            for vecchio, motivo in rapporto["non_migrabili"]:
+                _LOGGER.warning("Omoda9 adozione: %s non migrabile - %s", vecchio, motivo)
+            for vecchio, motivo in rapporto["saltate"]:
+                _LOGGER.warning("Omoda9 adozione: %s saltata - %s", vecchio, motivo)
+
+    hass.services.async_register(DOMAIN, "adopt_legacy_entities", _esegui)
 
 
 async def _async_migrate_entity_ids(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -167,6 +208,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Card Lovelace: registrata una volta sola (no-op dal secondo veicolo in poi).
     await _async_register_card(hass)
+
+    # Servizio di adozione: disponibile sempre, eseguito solo se qualcuno lo chiama.
+    await _async_register_adoption_service(hass)
 
     # Il monitor diagnostico va armato PRIMA del primo controllo sessione. È quel
     # controllo a decidere se aprire la riautenticazione, ed è esattamente l'evento che si
