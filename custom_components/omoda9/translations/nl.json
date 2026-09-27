@@ -444,6 +444,15 @@
       },
       "rear_center_seat_ventilation": {
         "name": "Ventilatie achterste middenzitplaats"
+      },
+      "charging_power": {
+        "name": "Charging power"
+      },
+      "wltp_range": {
+        "name": "WLTP range"
+      },
+      "electric_efficiency_mi_kwh": {
+        "name": "Electric efficiency (mi/kWh)"
       }
     },
     "switch": {

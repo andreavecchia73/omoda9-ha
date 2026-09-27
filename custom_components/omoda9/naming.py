@@ -81,6 +81,12 @@ ENGLISH_KEYS: dict[str, str] = {
     "durata_clima":                   "climate_duration",     # Climate duration
     "ricarica_durata":                "charge_duration",      # Charge duration
     # --- sensor ---
+    # Solo su BEV confermata: nascono dopo, quando le capability sono state sondate,
+    # quindi non c'erano nel registro da cui questa tabella e' stata generata. Il primo
+    # rapporto da un'auto elettrica vera li ha trovati ancora in italiano.
+    "potenza_di_ricarica":            "charging_power",             # Charging power
+    "autonomia_wltp":                 "wltp_range",                 # WLTP range
+    "efficienza_elettrica_mi_kwh":    "electric_efficiency_mi_kwh", # Electric efficiency (mi/kWh)
     "autonomia_benzina":              "fuel_range",           # Fuel range
     "autonomia_benzina_miglia":       "petrol_range_miles",   # Petrol range (miles)
     "autonomia_elettrica":            "electric_range",       # Electric range
