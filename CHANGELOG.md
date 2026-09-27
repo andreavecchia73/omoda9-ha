@@ -1,3 +1,13 @@
+# What is new in Omoda 9 / Jaecoo for Home Assistant
+
+What changes with each update, in plain words. The most recent entries are at
+the top. Versions are the "episode" number of the integration: update from
+**HACS → Omoda 9 / Jaecoo → Update**.
+
+Every release is written in both languages, English first.
+
+---
+
 # Novità di Omoda 9 / Jaecoo per Home Assistant
 
 Cosa cambia a ogni aggiornamento, spiegato in parole semplici.
@@ -7,63 +17,6 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 ## [Non rilasciato]
 
 ## v1.14.0 — 2026-08-24
-
-### 🇮🇹 Italiano
-
-- **«Autonomia benzina (miglia)» ora capisce da sola in che unità parla l'auto.** È un
-  sensore di diagnostica, e finora dava per scontato che quel dato arrivasse in miglia —
-  cosa vera sulla Omoda 9, ma dedotta da due sole letture di una sola macchina. Su un
-  modello che lo mandasse in chilometri, Home Assistant avrebbe convertito un numero già
-  metrico e mostrato **un'autonomia più lunga di una volta e mezza**. Adesso il confronto
-  con l'autonomia benzina normale, che arriva sempre in chilometri, dice quale delle due
-  cose sta succedendo. Sulla Omoda 9 non cambia niente: il numero è identico a prima.
-- **Un dato incompleto non fa più comparire un numero sbagliato.** Se in una lettura manca
-  il valore di confronto, quel sensore tiene l'ultimo numero buono invece di mostrarne uno
-  che potrebbe essere falso — e che sarebbe rimasto lì fino alla lettura dopo.
-- **Il login via SMS ora funziona, anche per gli account registrati solo col numero.** Chi accedeva col numero di telefono invece che con l'email otteneva sempre un errore, anche col codice giusto: l'integrazione componeva l'identità dell'account **nell'ordine sbagliato** (prefisso e numero invertiti) e coniava un token per un account fantasma vuoto, senza veicoli. Ora l'ordine è quello corretto — confermato sia dal vivo sia leggendo il programma dell'app ufficiale — e il login via SMS raggiunge il tuo account reale, con la tua auto.
-- **Un messaggio chiaro quando l'account non ha un'auto.** Se il codice era corretto ma su quell'account non risulta nessun veicolo, prima compariva «codice non valido», mandandoti a ricontrollare un OTP che invece andava benissimo. Adesso te lo diciamo com'è davvero: il codice è giusto, ma non c'è un'auto collegata a quell'account.
-- **Numero di telefono più protetto nei file di diagnostica.** La regola che nasconde il numero nei log è stata resa più robusta, così non può sfuggire per un caso di forma inattesa: nel dubbio nasconde di più, mai di meno.
-- **Puoi accedere con la password dell'account, senza aspettare nessun codice.** Finora
-  l'unica strada era il codice OTP via e-mail o SMS, e per chi quel codice non lo riceve
-  più era un muro: l'integrazione non si poteva proprio configurare. Adesso la prima
-  schermata offre una terza voce, «Accedi con password»: e-mail, password e PIN del
-  veicolo, e l'auto compare senza passare da nessun codice. La password serve **solo** per
-  entrare e non viene mai salvata: da lì in poi la sessione vive sul token, esattamente
-  come con l'OTP. E se un giorno la sessione scade, ti viene richiesta la password invece
-  di mandarti a caccia di un codice.
-- **Un menù a tendina sceglie marchio e regione al posto tuo.** L'integrazione si
-  presentava al server sempre come Omoda, quindi un account Chery non veniva riconosciuto e
-  bisognava indovinare a mano quattro parametri tecnici. Ora si sceglie «Omoda / Jaecoo
-  (Europa)» oppure «Chery (Europa)» e vengono compilati da soli; «Custom» resta per
-  qualsiasi altra regione o marchio, con i campi a vista come prima. *Nessuno di noi ha un
-  account Chery: la strada Omoda/Jaecoo è quella provata, l'altra è scritta seguendo il
-  programma dell'app ufficiale e aspetta la prima persona che la usi davvero.*
-- **Puoi scegliere in che lingua l'auto ti scrive.** Le e-mail e gli SMS col codice, e i
-  messaggi che il server restituisce quando qualcosa va storto, seguono la lingua dichiarata
-  al momento dell'accesso: prima era fissa. Ora c'è un menù a tendina, inglese o italiano.
-  Chi ha già l'integrazione configurata non deve fare niente e non vede alcun cambiamento;
-  la scelta riguarda le configurazioni nuove.
-- **La scheda per la dashboard arriva insieme all'integrazione.** Prima andava scaricata a
-  parte e registrata a mano fra le risorse di Lovelace, passaggio che si sbaglia facilmente
-  e che non tutti hanno voglia di fare. Adesso è inclusa e si carica da sola: basta
-  aggiungere una scheda di tipo `custom:chery-card`. Trova da sé le entità della tua auto,
-  quindi senza configurazione mostra già foto, batteria, autonomia, stato di ricarica e gli
-  avvisi (gomme, batteria bassa, auto irraggiungibile) solo quando c'è qualcosa che non va.
-- **Due contatori separati per l'energia caricata a casa e fuori, più un sensore che dice se
-  l'auto è a casa.** Servono a rispondere alla domanda «quanto mi costa davvero»: l'energia
-  presa dalla tua presa e quella presa altrove finiscono in due totali distinti, utilizzabili
-  nel pannello Energia di Home Assistant. ⚠️ **Funzionano solo con l'aggiornamento automatico
-  acceso**: i contatori si costruiscono campionando la potenza di ricarica a ogni lettura, e
-  senza letture periodiche non c'è niente da sommare.
-- **Quando un comando viene rifiutato, adesso ti diciamo perché.** Se prima di mandare un comando l'integrazione deve saltare o adattare qualcosa — una funzione che il costruttore non autorizza sulla tua auto, una durata che la tua vettura non accetta — te lo scrive in «Esito comando». Fino a ieri però quella spiegazione compariva **solo quando il comando riusciva**: nel caso opposto, che è proprio quello in cui serve, restava scritto solo l'errore nudo e il motivo finiva unicamente nel registro tecnico, dove nessuno lo va a cercare. Adesso la spiegazione resta attaccata all'esito in entrambi i casi. E non ripetiamo più il nome del comando davanti alla spiegazione, visto che l'esito lo dice già come prima cosa: erano i caratteri che mancavano perché la frase ci stesse tutta nello spazio che Home Assistant concede. Su un'Omoda 9 quasi tutti questi avvisi non escono affatto — riguardano funzioni che il costruttore nega su altre vetture — ma **uno lo vedrai anche tu**: se imposti la durata del clima su un valore che l'auto non ammette (il cursore arriva a 30 minuti, l'Omoda 9 ne accetta 5, 10 o 15) e il comando viene rifiutato, per esempio perché l'auto è occupata, adesso accanto all'errore leggi anche quale durata è stata usata. Prima, in quel caso, restava solo l'errore.
-- **Un avviso o si legge intero o non c'è.** Quando gli avvisi non entrano tutti nella riga te ne diciamo il numero. Restava però un caso in cui, per far posto a quel conteggio, l'ultimo avviso veniva accorciato a metà parola: proprio la cosa che questa regola vuole evitare, perché una frase tagliata sembra completa. Adesso l'avviso che non ci sta per intero esce dalla riga e va a ingrossare il conteggio.
-- **«Raffredda tutto» ora fa qualcosa anche sulle auto che quel comando non ce l'hanno.** Su alcune vetture il costruttore non autorizza affatto il pulsante unico «raffredda tutto»: premendolo si otteneva soltanto un errore, e non c'era niente da fare. I suoi **pezzi**, però, quella stessa auto li autorizza benissimo, presi uno per uno: il climatizzatore e la ventilazione dei sedili anteriori. Adesso, quando il comando unico è negato, l'integrazione lo rifà da sé in un'unica richiesta che l'auto accetta — la stessa identica cosa che otterresti accendendo a mano il clima e poi i sedili dall'app ufficiale. Quello che la tua vettura non consente resta fuori, e **in «Esito comando» trovi quante funzioni sono rimaste indietro** invece di doverlo indovinare da un sedile che resta tiepido; se nella riga ci sta anche il loro nome te lo scriviamo, e per esteso ci sono comunque sempre nel registro. (Lo spazio è poco davvero: Home Assistant concede 255 caratteri a un messaggio, esito compreso.)
-- **Provato su un'auto vera, non solo sulla carta — l'accensione.** Il proprietario di una Jaecoo 7 (l'auto da cui è nata tutta questa storia) ha spedito a mano la richiesta ricomposta a vettura ferma: accettata, ed è uscito a toccare i cuscini — **i due sedili anteriori ventilavano davvero**. Lo **spegnimento** è il gemello simmetrico di quella richiesta, ma quello nessuno l'ha ancora provato: se la tua auto lo rifiutasse, l'interruttore non ti direbbe «spento» per finta — resta com'era e leggi l'errore.
-- **Sulla sua auto i sedili posteriori restano fuori, e ci ha detto che non è una rinuncia:** su quella vettura i sedili di dietro non sono né riscaldati né ventilati. Vale la pena dirlo perché lo ha verificato lui a bordo: **noi non possiamo dedurre da questo elenco cosa la tua auto abbia o non abbia montato**, e non ci proviamo.
-- **Il freddo sì, il caldo no — e non è una dimenticanza.** «Riscalda tutto» non viene ricomposto allo stesso modo, perché fra le cose che accende c'è il volante riscaldato, e per il volante non sappiamo quale strada alternativa l'auto accetterebbe: tirare a indovinare rischierebbe di far fallire tutto il resto. Su tutte le vetture che conosciamo, del resto, il comando del caldo è già autorizzato e gli basta la potatura che c'era già.
-- **Su un'Omoda 9 non cambia assolutamente nulla.** Lì il comando del costruttore è autorizzato e funziona: quando la via ufficiale è aperta non la sostituiamo mai con una nostra imitazione.
-
-- **Se l'accesso fallisce dopo che il codice e' stato accettato, adesso ti diciamo dove si e' rotto.** Chi si bloccava al primo accesso leggeva sempre la stessa frase, "token coniato ma login ancora KO", e non aveva modo di capire cosa provare: il codice era sbagliato? l'ora del computer? il PIN? Nessuna delle tre. Quel messaggio vuol dire che **il codice e' stato accettato** e che a fallire e' il passo successivo, il collegamento al server che tiene le tue auto. L'integrazione sapeva gia' distinguere fra un problema di rete, una sessione scaduta e un rinnovo non riuscito, ma buttava via quella informazione un istante prima di scriverla. Adesso la trovi nel messaggio, e nel registro tecnico compare anche la risposta del server. Non e' una riparazione: e' la differenza fra un guasto che si puo' diagnosticare e uno su cui si tira a indovinare. Se sei fra le persone ferme qui, il prossimo tentativo produce finalmente qualcosa da mandarci.
 
 ### 🇬🇧 English
 
@@ -122,26 +75,64 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 
 - **If the login fails after your code was accepted, we now tell you where it broke.** Anyone stuck at first setup got the same sentence every time, "token minted but login still KO", with no way to tell what to try next: wrong code? clock out of sync? the PIN? None of the three. That message means **the code was accepted** and what fails is the step after it, the connection to the server holding your cars. The integration already knew how to tell a network problem from an expired session from a failed renewal, and threw that away an instant before writing the message. It is in the message now, and the server's own answer goes to the technical log. This is not a repair: it is the difference between a fault you can diagnose and one you guess at. If you are one of the people stuck here, your next attempt finally produces something you can send us.
 
-## v1.13.0 — 2026-08-10
-
 ### 🇮🇹 Italiano
 
-- **L'integrazione ora chiede alla tua auto com'è fatta, invece di darlo per scontato.** Alcuni valori erano scritti a mano nel programma perché era così che funzionava l'Omoda 9 su cui è nata: quanto freddo e quanto caldo chiedere con i pulsanti «Raffredda tutto» e «Riscalda tutto», e quanti minuti far durare il climatizzatore. Su un'altra vettura quei numeri possono essere diversi, e nessuno se ne sarebbe accorto. Adesso li legge dalla scheda tecnica che il costruttore invia **insieme al nome dell'auto**: è una risposta che l'integrazione si faceva già mandare, quindi non c'è nessun nuovo tipo di domanda ai server del costruttore.
-- **Se imposti una durata che la tua auto non accetta, te lo diciamo.** Il cursore «Durata clima» arriva a 30 minuti, ma non tutte le vetture li accettano: l'Omoda 9, per esempio, ammette solo 5, 10 o 15 minuti. Prima le veniva chiesto un valore che non capiva; adesso si usa il valore ammesso **subito inferiore** a quello che hai scelto — mai uno più lungo, non sarebbe ciò che hai chiesto — e **lo trovi scritto** nell'esito del comando, invece di scoprirlo dal fatto che l'auto si spegne prima.
-- **Al primo avvio dopo l'aggiornamento l'integrazione fa una domanda in più all'auto, una volta sola.** Chi ha già l'integrazione installata aveva la scheda tecnica letta con le informazioni di allora, che non comprendevano questi valori: senza rileggerla, la novità qui sopra non sarebbe mai arrivata a chi c'è già. Succede una volta e poi non più.
-- **Un limite che preferiamo dirti.** Se la tua auto ammette durate brevi — mettiamo 5 minuti — l'auto spegne il climatizzatore dopo 5 minuti, ma l'interruttore in Home Assistant resta acceso ancora per qualche minuto prima di tornare da solo su «spento». È solo l'interruttore a essere indietro: nessun comando sbagliato parte, e sull'Omoda 9 non capita affatto. Lo sistemeremo con calma, in un aggiornamento che non tocchi anche i comandi del clima.
-- **Su un'Omoda 9 non cambia assolutamente nulla.** I valori che il costruttore dichiara per questa vettura sono esattamente quelli che c'erano scritti a mano. Questo aggiornamento serve alle **altre** auto della famiglia: è un pezzo del lavoro per far funzionare l'integrazione anche su Jaecoo e sui modelli solo elettrici.
-- **«Raffredda tutto» e «Riscalda tutto»: ora vale sempre l'ultima cosa che hai premuto.** Se spegnevi e subito riaccendevi (o il contrario), i due comandi potevano arrivare all'auto **in ordine invertito**: l'auto partiva e poi si spegneva da sola, mentre l'interruttore restava acceso — e riprovando sembrava che non ripartisse più. Il motivo: prima di mandare il comando l'integrazione deve svegliare l'auto, e l'attesa è molto più lunga se l'auto dorme; la prima pressione la sveglia, così la seconda faceva meno strada e arrivava per prima. Adesso il comando sorpassato viene semplicemente lasciato cadere: all'auto arriva solo l'ultima cosa che hai chiesto.
-- **Mentre l'auto si sveglia adesso te lo diciamo.** Per una mezza minuto buono, dopo aver premuto, non compariva nulla: era il silenzio a far ripremere il tasto, cioè proprio la causa del problema qui sopra. Ora nell'«Esito comando» compare *«Sveglio l'auto: il comando parte fra ~35 secondi»*.
-- **Dopo un riavvio di Home Assistant l'interruttore non resta più acceso a vuoto.** La preclimatizzazione dura un quarto d'ora e poi l'interruttore si spegne da solo; ma se nel frattempo Home Assistant veniva riavviato — o aggiornavi l'integrazione — quel promemoria andava perso e l'interruttore restava acceso a tempo indeterminato, annunciando qualcosa che l'auto aveva già finito. Ora riprende il conto da dove era rimasto, e se nel frattempo il quarto d'ora è passato si presenta già spento.
-- **Se lo spegnimento non riesce, l'interruttore non dice più «spento».** Quando il comando non riusciva a partire, l'interruttore si metteva comunque su spento mentre l'auto continuava tranquillamente a raffreddare. Adesso resta com'era, che è la verità.
-- **Quando l'auto spegne la preclimatizzazione, l'interruttore adesso se ne accorge.** «Raffredda tutto» e «Riscalda tutto» non guardavano affatto quello che l'auto racconta di sé: se i due si disallineavano — perché avevi usato l'app ufficiale, perché l'auto aveva finito prima, o perché avevi spento tutto dal cruscotto — l'interruttore restava acceso fino allo scadere del quarto d'ora, e non c'era modo di rimetterlo a posto se non a mano. Ora, quando l'auto comunica che il climatizzatore è spento, l'interruttore la segue. **Solo in quel verso**: il clima acceso per altri motivi non fa comparire da solo un «Raffredda tutto» che non hai chiesto.
-- **Gli interruttori non tornano più indietro da soli subito dopo averli premuti.** Accendevi il sedile ventilato, l'interruttore si accendeva, e pochi secondi dopo tornava spento pur essendo il sedile acceso. Succedeva perché bastava un messaggio qualsiasi dell'auto — anche uno che non parlava affatto di quel sedile, come la conferma del comando stesso — per far ricadere l'interruttore sull'ultimo valore misurato, che era quello di prima. Adesso si aspetta che l'auto dica qualcosa **su quella funzione**. Vale per sedili, sbrinamenti, volante, serratura, baule, finestrini, tetto e per la scheda del clima.
-- **Un blocco raro che rendeva l'integrazione muta fino al riavvio.** Se un comando veniva interrotto a metà — capita con le automazioni impostate su «riavvia» — il posto in coda non veniva più restituito a nessuno: da quel momento ogni comando successivo, anche premuto giorni dopo, falliva con «L'auto è ancora impegnata coi comandi precedenti» e l'unico rimedio era riavviare Home Assistant. Ora il posto torna libero in ogni caso.
-- **Antifurto: dopo ogni comando ricontrolliamo com'è messo davvero.** È l'unica funzione di cui l'auto non manda mai lo stato da sola: finora il valore mostrato era quello letto all'avvio di Home Assistant, e poteva restare sbagliato per tutta la giornata. Adesso, subito dopo aver acceso o spento l'antifurto, l'integrazione richiede al costruttore lo stato aggiornato. **Non cambia quello che vedi sul momento**: quello resta ciò che hai chiesto, perché la risposta arriva prima che l'auto abbia finito di eseguire.
-- **Una sola sveglia alla volta.** Quando l'auto dorme va svegliata prima di poterle parlare, e capitava che la preclimatizzazione e l'aggiornamento automatico la svegliassero nello stesso momento, ciascuno per conto suo: la seconda sveglia arrivava a vuoto e l'auto la rifiutava come «sono occupata», rallentando il comando vero. Adesso chi arriva secondo aspetta la sveglia già in corso.
-- **Niente più avvisi quando «Raffredda tutto» fa quel che può.** Se usi l'automazione pronta che ti avverte dei comandi non riusciti (il *blueprint* «Avviso comando non riuscito»), fino a ieri ti compariva un avviso a **ogni** pressione di «Raffredda tutto» e «Riscalda tutto»: l'auto ferma accende il climatizzatore ma non i sedili ventilati, e questo veniva segnalato come «eseguito solo in parte». Non è un guasto, è come funziona l'auto — e un avviso che compare sempre e non chiede niente insegna solo a ignorare anche quelli veri. Adesso ricevi il popup **solo quando un comando non parte davvero**. Se quel dettaglio ti interessa c'è una nuova opzione per riaverlo, ed è comunque sempre scritto in «Esito comando».
-- **Gli avvisi dei comandi non spariscono più in un lampo.** Quando l'integrazione corregge o salta qualcosa prima di mandare un comando — una durata che la tua auto non accetta, una funzione che il costruttore non autorizza — te lo scrive in «Esito comando». Solo che quel messaggio veniva subito coperto dal passaggio successivo: **misurato sull'auto, restava leggibile 12 millesimi di secondo.** Era scritto, ma nessuno poteva leggerlo. Adesso resta attaccato all'esito del comando e sopravvive anche alla conferma che l'auto manda qualche secondo dopo. Se gli avvisi sono tanti e non entrano tutti nello spazio disponibile, ti diciamo **quanti ne restano fuori** invece di troncarne uno a metà: un avviso tagliato sembra completo, ed è peggio di un avviso assente. Su un'Omoda 9 con le impostazioni normali non compare nulla di nuovo — gli avvisi escono solo quando c'è davvero qualcosa da dire.
+- **«Autonomia benzina (miglia)» ora capisce da sola in che unità parla l'auto.** È un
+  sensore di diagnostica, e finora dava per scontato che quel dato arrivasse in miglia —
+  cosa vera sulla Omoda 9, ma dedotta da due sole letture di una sola macchina. Su un
+  modello che lo mandasse in chilometri, Home Assistant avrebbe convertito un numero già
+  metrico e mostrato **un'autonomia più lunga di una volta e mezza**. Adesso il confronto
+  con l'autonomia benzina normale, che arriva sempre in chilometri, dice quale delle due
+  cose sta succedendo. Sulla Omoda 9 non cambia niente: il numero è identico a prima.
+- **Un dato incompleto non fa più comparire un numero sbagliato.** Se in una lettura manca
+  il valore di confronto, quel sensore tiene l'ultimo numero buono invece di mostrarne uno
+  che potrebbe essere falso — e che sarebbe rimasto lì fino alla lettura dopo.
+- **Il login via SMS ora funziona, anche per gli account registrati solo col numero.** Chi accedeva col numero di telefono invece che con l'email otteneva sempre un errore, anche col codice giusto: l'integrazione componeva l'identità dell'account **nell'ordine sbagliato** (prefisso e numero invertiti) e coniava un token per un account fantasma vuoto, senza veicoli. Ora l'ordine è quello corretto — confermato sia dal vivo sia leggendo il programma dell'app ufficiale — e il login via SMS raggiunge il tuo account reale, con la tua auto.
+- **Un messaggio chiaro quando l'account non ha un'auto.** Se il codice era corretto ma su quell'account non risulta nessun veicolo, prima compariva «codice non valido», mandandoti a ricontrollare un OTP che invece andava benissimo. Adesso te lo diciamo com'è davvero: il codice è giusto, ma non c'è un'auto collegata a quell'account.
+- **Numero di telefono più protetto nei file di diagnostica.** La regola che nasconde il numero nei log è stata resa più robusta, così non può sfuggire per un caso di forma inattesa: nel dubbio nasconde di più, mai di meno.
+- **Puoi accedere con la password dell'account, senza aspettare nessun codice.** Finora
+  l'unica strada era il codice OTP via e-mail o SMS, e per chi quel codice non lo riceve
+  più era un muro: l'integrazione non si poteva proprio configurare. Adesso la prima
+  schermata offre una terza voce, «Accedi con password»: e-mail, password e PIN del
+  veicolo, e l'auto compare senza passare da nessun codice. La password serve **solo** per
+  entrare e non viene mai salvata: da lì in poi la sessione vive sul token, esattamente
+  come con l'OTP. E se un giorno la sessione scade, ti viene richiesta la password invece
+  di mandarti a caccia di un codice.
+- **Un menù a tendina sceglie marchio e regione al posto tuo.** L'integrazione si
+  presentava al server sempre come Omoda, quindi un account Chery non veniva riconosciuto e
+  bisognava indovinare a mano quattro parametri tecnici. Ora si sceglie «Omoda / Jaecoo
+  (Europa)» oppure «Chery (Europa)» e vengono compilati da soli; «Custom» resta per
+  qualsiasi altra regione o marchio, con i campi a vista come prima. *Nessuno di noi ha un
+  account Chery: la strada Omoda/Jaecoo è quella provata, l'altra è scritta seguendo il
+  programma dell'app ufficiale e aspetta la prima persona che la usi davvero.*
+- **Puoi scegliere in che lingua l'auto ti scrive.** Le e-mail e gli SMS col codice, e i
+  messaggi che il server restituisce quando qualcosa va storto, seguono la lingua dichiarata
+  al momento dell'accesso: prima era fissa. Ora c'è un menù a tendina, inglese o italiano.
+  Chi ha già l'integrazione configurata non deve fare niente e non vede alcun cambiamento;
+  la scelta riguarda le configurazioni nuove.
+- **La scheda per la dashboard arriva insieme all'integrazione.** Prima andava scaricata a
+  parte e registrata a mano fra le risorse di Lovelace, passaggio che si sbaglia facilmente
+  e che non tutti hanno voglia di fare. Adesso è inclusa e si carica da sola: basta
+  aggiungere una scheda di tipo `custom:chery-card`. Trova da sé le entità della tua auto,
+  quindi senza configurazione mostra già foto, batteria, autonomia, stato di ricarica e gli
+  avvisi (gomme, batteria bassa, auto irraggiungibile) solo quando c'è qualcosa che non va.
+- **Due contatori separati per l'energia caricata a casa e fuori, più un sensore che dice se
+  l'auto è a casa.** Servono a rispondere alla domanda «quanto mi costa davvero»: l'energia
+  presa dalla tua presa e quella presa altrove finiscono in due totali distinti, utilizzabili
+  nel pannello Energia di Home Assistant. ⚠️ **Funzionano solo con l'aggiornamento automatico
+  acceso**: i contatori si costruiscono campionando la potenza di ricarica a ogni lettura, e
+  senza letture periodiche non c'è niente da sommare.
+- **Quando un comando viene rifiutato, adesso ti diciamo perché.** Se prima di mandare un comando l'integrazione deve saltare o adattare qualcosa — una funzione che il costruttore non autorizza sulla tua auto, una durata che la tua vettura non accetta — te lo scrive in «Esito comando». Fino a ieri però quella spiegazione compariva **solo quando il comando riusciva**: nel caso opposto, che è proprio quello in cui serve, restava scritto solo l'errore nudo e il motivo finiva unicamente nel registro tecnico, dove nessuno lo va a cercare. Adesso la spiegazione resta attaccata all'esito in entrambi i casi. E non ripetiamo più il nome del comando davanti alla spiegazione, visto che l'esito lo dice già come prima cosa: erano i caratteri che mancavano perché la frase ci stesse tutta nello spazio che Home Assistant concede. Su un'Omoda 9 quasi tutti questi avvisi non escono affatto — riguardano funzioni che il costruttore nega su altre vetture — ma **uno lo vedrai anche tu**: se imposti la durata del clima su un valore che l'auto non ammette (il cursore arriva a 30 minuti, l'Omoda 9 ne accetta 5, 10 o 15) e il comando viene rifiutato, per esempio perché l'auto è occupata, adesso accanto all'errore leggi anche quale durata è stata usata. Prima, in quel caso, restava solo l'errore.
+- **Un avviso o si legge intero o non c'è.** Quando gli avvisi non entrano tutti nella riga te ne diciamo il numero. Restava però un caso in cui, per far posto a quel conteggio, l'ultimo avviso veniva accorciato a metà parola: proprio la cosa che questa regola vuole evitare, perché una frase tagliata sembra completa. Adesso l'avviso che non ci sta per intero esce dalla riga e va a ingrossare il conteggio.
+- **«Raffredda tutto» ora fa qualcosa anche sulle auto che quel comando non ce l'hanno.** Su alcune vetture il costruttore non autorizza affatto il pulsante unico «raffredda tutto»: premendolo si otteneva soltanto un errore, e non c'era niente da fare. I suoi **pezzi**, però, quella stessa auto li autorizza benissimo, presi uno per uno: il climatizzatore e la ventilazione dei sedili anteriori. Adesso, quando il comando unico è negato, l'integrazione lo rifà da sé in un'unica richiesta che l'auto accetta — la stessa identica cosa che otterresti accendendo a mano il clima e poi i sedili dall'app ufficiale. Quello che la tua vettura non consente resta fuori, e **in «Esito comando» trovi quante funzioni sono rimaste indietro** invece di doverlo indovinare da un sedile che resta tiepido; se nella riga ci sta anche il loro nome te lo scriviamo, e per esteso ci sono comunque sempre nel registro. (Lo spazio è poco davvero: Home Assistant concede 255 caratteri a un messaggio, esito compreso.)
+- **Provato su un'auto vera, non solo sulla carta — l'accensione.** Il proprietario di una Jaecoo 7 (l'auto da cui è nata tutta questa storia) ha spedito a mano la richiesta ricomposta a vettura ferma: accettata, ed è uscito a toccare i cuscini — **i due sedili anteriori ventilavano davvero**. Lo **spegnimento** è il gemello simmetrico di quella richiesta, ma quello nessuno l'ha ancora provato: se la tua auto lo rifiutasse, l'interruttore non ti direbbe «spento» per finta — resta com'era e leggi l'errore.
+- **Sulla sua auto i sedili posteriori restano fuori, e ci ha detto che non è una rinuncia:** su quella vettura i sedili di dietro non sono né riscaldati né ventilati. Vale la pena dirlo perché lo ha verificato lui a bordo: **noi non possiamo dedurre da questo elenco cosa la tua auto abbia o non abbia montato**, e non ci proviamo.
+- **Il freddo sì, il caldo no — e non è una dimenticanza.** «Riscalda tutto» non viene ricomposto allo stesso modo, perché fra le cose che accende c'è il volante riscaldato, e per il volante non sappiamo quale strada alternativa l'auto accetterebbe: tirare a indovinare rischierebbe di far fallire tutto il resto. Su tutte le vetture che conosciamo, del resto, il comando del caldo è già autorizzato e gli basta la potatura che c'era già.
+- **Su un'Omoda 9 non cambia assolutamente nulla.** Lì il comando del costruttore è autorizzato e funziona: quando la via ufficiale è aperta non la sostituiamo mai con una nostra imitazione.
+
+- **Se l'accesso fallisce dopo che il codice e' stato accettato, adesso ti diciamo dove si e' rotto.** Chi si bloccava al primo accesso leggeva sempre la stessa frase, "token coniato ma login ancora KO", e non aveva modo di capire cosa provare: il codice era sbagliato? l'ora del computer? il PIN? Nessuna delle tre. Quel messaggio vuol dire che **il codice e' stato accettato** e che a fallire e' il passo successivo, il collegamento al server che tiene le tue auto. L'integrazione sapeva gia' distinguere fra un problema di rete, una sessione scaduta e un rinnovo non riuscito, ma buttava via quella informazione un istante prima di scriverla. Adesso la trovi nel messaggio, e nel registro tecnico compare anche la risposta del server. Non e' una riparazione: e' la differenza fra un guasto che si puo' diagnosticare e uno su cui si tira a indovinare. Se sei fra le persone ferme qui, il prossimo tentativo produce finalmente qualcosa da mandarci.
+
+## v1.13.0 — 2026-08-10
 
 ### 🇬🇧 English
 
@@ -162,13 +153,26 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **No more alerts when "Cool everything" does what it can.** If you use the ready-made automation that warns you about failed commands (the "Failed command alert" *blueprint*), until yesterday an alert popped up on **every** press of "Cool everything" and "Heat everything": on a parked car the climate control starts but the ventilated seats do not, and that was reported as "carried out only in part". It is not a fault, it is how the car works — and an alert that always shows up and asks nothing of you only teaches you to ignore the real ones too. You now get the popup **only when a command genuinely fails to go out**. If you care about that detail there is a new option to bring it back, and it is written in "Command result" either way.
 - **Command warnings no longer vanish in a flash.** When the integration corrects or skips something before sending a command — a duration your car does not accept, a function the manufacturer does not authorise — it writes so in "Command result". Except that the message was immediately covered by the next step: **measured on the car, it stayed readable for 12 thousandths of a second.** It was written, but nobody could read it. It now stays attached to the command's result and survives the confirmation the car sends a few seconds later. If there are many warnings and they do not all fit in the space available, we tell you **how many are left out** rather than cutting one in half: a truncated warning looks complete, which is worse than a missing one. On an Omoda 9 with normal settings nothing new appears — warnings only come out when there is genuinely something to say.
 
-## v1.12.1 — 2026-08-10
-
 ### 🇮🇹 Italiano
 
-- **Nuovo sensore: «Partenza programmata».** L'auto ci mandava già, a ogni collegamento, il piano di partenza impostato dall'app ufficiale — orario e giorni — e noi lo buttavamo via senza guardarlo. Ora lo vedi in Home Assistant: l'orario, i giorni della settimana e se il piano è attivo o spento. **È solo una lettura**: per cambiare il piano si usa ancora l'app. Non aggiunge nessuna richiesta ai server del costruttore, perché è un dato che arrivava già.
-- **La ricarica programmata mostra anche il piano che ha davvero l'auto.** Finora l'interruttore mostrava soltanto le preferenze impostate qui dentro: se cambiavi la programmazione dall'app ufficiale, Home Assistant non lo sapeva. Adesso, quando l'auto comunica il suo piano, trovi orario, durata e giorni **come li ha lei**. Compaiono quando l'auto li manda, cioè quando qualcosa cambia: se non ci sono, non vuol dire che non ci sia un piano.
-- **Una data che non ti mostriamo, di proposito.** Il piano di partenza arriva accompagnato da un «creato il» e un «modificato il» che sembrano dire quando l'hai impostato. Non lo dicono: il costruttore li riscrive a ogni interrogazione, e infatti risultano sempre di pochi secondi fa. Li abbiamo lasciati fuori, perché un dato inventato che sembra autorevole è peggio di un dato assente.
+- **L'integrazione ora chiede alla tua auto com'è fatta, invece di darlo per scontato.** Alcuni valori erano scritti a mano nel programma perché era così che funzionava l'Omoda 9 su cui è nata: quanto freddo e quanto caldo chiedere con i pulsanti «Raffredda tutto» e «Riscalda tutto», e quanti minuti far durare il climatizzatore. Su un'altra vettura quei numeri possono essere diversi, e nessuno se ne sarebbe accorto. Adesso li legge dalla scheda tecnica che il costruttore invia **insieme al nome dell'auto**: è una risposta che l'integrazione si faceva già mandare, quindi non c'è nessun nuovo tipo di domanda ai server del costruttore.
+- **Se imposti una durata che la tua auto non accetta, te lo diciamo.** Il cursore «Durata clima» arriva a 30 minuti, ma non tutte le vetture li accettano: l'Omoda 9, per esempio, ammette solo 5, 10 o 15 minuti. Prima le veniva chiesto un valore che non capiva; adesso si usa il valore ammesso **subito inferiore** a quello che hai scelto — mai uno più lungo, non sarebbe ciò che hai chiesto — e **lo trovi scritto** nell'esito del comando, invece di scoprirlo dal fatto che l'auto si spegne prima.
+- **Al primo avvio dopo l'aggiornamento l'integrazione fa una domanda in più all'auto, una volta sola.** Chi ha già l'integrazione installata aveva la scheda tecnica letta con le informazioni di allora, che non comprendevano questi valori: senza rileggerla, la novità qui sopra non sarebbe mai arrivata a chi c'è già. Succede una volta e poi non più.
+- **Un limite che preferiamo dirti.** Se la tua auto ammette durate brevi — mettiamo 5 minuti — l'auto spegne il climatizzatore dopo 5 minuti, ma l'interruttore in Home Assistant resta acceso ancora per qualche minuto prima di tornare da solo su «spento». È solo l'interruttore a essere indietro: nessun comando sbagliato parte, e sull'Omoda 9 non capita affatto. Lo sistemeremo con calma, in un aggiornamento che non tocchi anche i comandi del clima.
+- **Su un'Omoda 9 non cambia assolutamente nulla.** I valori che il costruttore dichiara per questa vettura sono esattamente quelli che c'erano scritti a mano. Questo aggiornamento serve alle **altre** auto della famiglia: è un pezzo del lavoro per far funzionare l'integrazione anche su Jaecoo e sui modelli solo elettrici.
+- **«Raffredda tutto» e «Riscalda tutto»: ora vale sempre l'ultima cosa che hai premuto.** Se spegnevi e subito riaccendevi (o il contrario), i due comandi potevano arrivare all'auto **in ordine invertito**: l'auto partiva e poi si spegneva da sola, mentre l'interruttore restava acceso — e riprovando sembrava che non ripartisse più. Il motivo: prima di mandare il comando l'integrazione deve svegliare l'auto, e l'attesa è molto più lunga se l'auto dorme; la prima pressione la sveglia, così la seconda faceva meno strada e arrivava per prima. Adesso il comando sorpassato viene semplicemente lasciato cadere: all'auto arriva solo l'ultima cosa che hai chiesto.
+- **Mentre l'auto si sveglia adesso te lo diciamo.** Per una mezza minuto buono, dopo aver premuto, non compariva nulla: era il silenzio a far ripremere il tasto, cioè proprio la causa del problema qui sopra. Ora nell'«Esito comando» compare *«Sveglio l'auto: il comando parte fra ~35 secondi»*.
+- **Dopo un riavvio di Home Assistant l'interruttore non resta più acceso a vuoto.** La preclimatizzazione dura un quarto d'ora e poi l'interruttore si spegne da solo; ma se nel frattempo Home Assistant veniva riavviato — o aggiornavi l'integrazione — quel promemoria andava perso e l'interruttore restava acceso a tempo indeterminato, annunciando qualcosa che l'auto aveva già finito. Ora riprende il conto da dove era rimasto, e se nel frattempo il quarto d'ora è passato si presenta già spento.
+- **Se lo spegnimento non riesce, l'interruttore non dice più «spento».** Quando il comando non riusciva a partire, l'interruttore si metteva comunque su spento mentre l'auto continuava tranquillamente a raffreddare. Adesso resta com'era, che è la verità.
+- **Quando l'auto spegne la preclimatizzazione, l'interruttore adesso se ne accorge.** «Raffredda tutto» e «Riscalda tutto» non guardavano affatto quello che l'auto racconta di sé: se i due si disallineavano — perché avevi usato l'app ufficiale, perché l'auto aveva finito prima, o perché avevi spento tutto dal cruscotto — l'interruttore restava acceso fino allo scadere del quarto d'ora, e non c'era modo di rimetterlo a posto se non a mano. Ora, quando l'auto comunica che il climatizzatore è spento, l'interruttore la segue. **Solo in quel verso**: il clima acceso per altri motivi non fa comparire da solo un «Raffredda tutto» che non hai chiesto.
+- **Gli interruttori non tornano più indietro da soli subito dopo averli premuti.** Accendevi il sedile ventilato, l'interruttore si accendeva, e pochi secondi dopo tornava spento pur essendo il sedile acceso. Succedeva perché bastava un messaggio qualsiasi dell'auto — anche uno che non parlava affatto di quel sedile, come la conferma del comando stesso — per far ricadere l'interruttore sull'ultimo valore misurato, che era quello di prima. Adesso si aspetta che l'auto dica qualcosa **su quella funzione**. Vale per sedili, sbrinamenti, volante, serratura, baule, finestrini, tetto e per la scheda del clima.
+- **Un blocco raro che rendeva l'integrazione muta fino al riavvio.** Se un comando veniva interrotto a metà — capita con le automazioni impostate su «riavvia» — il posto in coda non veniva più restituito a nessuno: da quel momento ogni comando successivo, anche premuto giorni dopo, falliva con «L'auto è ancora impegnata coi comandi precedenti» e l'unico rimedio era riavviare Home Assistant. Ora il posto torna libero in ogni caso.
+- **Antifurto: dopo ogni comando ricontrolliamo com'è messo davvero.** È l'unica funzione di cui l'auto non manda mai lo stato da sola: finora il valore mostrato era quello letto all'avvio di Home Assistant, e poteva restare sbagliato per tutta la giornata. Adesso, subito dopo aver acceso o spento l'antifurto, l'integrazione richiede al costruttore lo stato aggiornato. **Non cambia quello che vedi sul momento**: quello resta ciò che hai chiesto, perché la risposta arriva prima che l'auto abbia finito di eseguire.
+- **Una sola sveglia alla volta.** Quando l'auto dorme va svegliata prima di poterle parlare, e capitava che la preclimatizzazione e l'aggiornamento automatico la svegliassero nello stesso momento, ciascuno per conto suo: la seconda sveglia arrivava a vuoto e l'auto la rifiutava come «sono occupata», rallentando il comando vero. Adesso chi arriva secondo aspetta la sveglia già in corso.
+- **Niente più avvisi quando «Raffredda tutto» fa quel che può.** Se usi l'automazione pronta che ti avverte dei comandi non riusciti (il *blueprint* «Avviso comando non riuscito»), fino a ieri ti compariva un avviso a **ogni** pressione di «Raffredda tutto» e «Riscalda tutto»: l'auto ferma accende il climatizzatore ma non i sedili ventilati, e questo veniva segnalato come «eseguito solo in parte». Non è un guasto, è come funziona l'auto — e un avviso che compare sempre e non chiede niente insegna solo a ignorare anche quelli veri. Adesso ricevi il popup **solo quando un comando non parte davvero**. Se quel dettaglio ti interessa c'è una nuova opzione per riaverlo, ed è comunque sempre scritto in «Esito comando».
+- **Gli avvisi dei comandi non spariscono più in un lampo.** Quando l'integrazione corregge o salta qualcosa prima di mandare un comando — una durata che la tua auto non accetta, una funzione che il costruttore non autorizza — te lo scrive in «Esito comando». Solo che quel messaggio veniva subito coperto dal passaggio successivo: **misurato sull'auto, restava leggibile 12 millesimi di secondo.** Era scritto, ma nessuno poteva leggerlo. Adesso resta attaccato all'esito del comando e sopravvive anche alla conferma che l'auto manda qualche secondo dopo. Se gli avvisi sono tanti e non entrano tutti nello spazio disponibile, ti diciamo **quanti ne restano fuori** invece di troncarne uno a metà: un avviso tagliato sembra completo, ed è peggio di un avviso assente. Su un'Omoda 9 con le impostazioni normali non compare nulla di nuovo — gli avvisi escono solo quando c'è davvero qualcosa da dire.
+
+## v1.12.1 — 2026-08-10
 
 ### 🇬🇧 English
 
@@ -176,15 +180,13 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **Scheduled charging also shows the plan the car actually holds.** Until now the switch showed only the preferences set in here: if you changed the schedule from the official app, Home Assistant never knew. Now, when the car reports its plan, you get time, duration and days **as the car has them**. They appear when the car sends them, that is when something changes: their absence does not mean there is no plan.
 - **One date we deliberately do not show you.** The departure plan arrives with a "created on" and a "modified on" that look like they say when you set it. They do not: the manufacturer rewrites them on every query, which is why they are always a few seconds old. We left them out, because an invented figure that looks authoritative is worse than a missing one.
 
-## v1.12.0 — 2026-08-10
-
 ### 🇮🇹 Italiano
 
-- **Nuovo interruttore: «Disappannamento parabrezza».** L'auto sa fare due cose diverse sul vetro davanti, e finora l'integrazione ne offriva una sola. Quella che c'era già, «Sbrinamento parabrezza», **scalda il vetro** con le resistenze elettriche. Questa nuova soffia invece **l'aria del climatizzatore sul parabrezza**, che è il modo rapido per togliere la condensa. Sono comandi distinti e l'auto li tiene separati.
-- ⚠️ **Da sapere prima di usarlo: accende anche il climatizzatore** per circa 15 minuti, perché è il climatizzatore stesso a soffiare l'aria sul vetro. Non è un difetto, è come funziona sull'auto. Per lo stesso motivo, spegnere il disappannamento spegne il clima.
-- **Antifurto: se la tua auto non lo autorizza, ora te lo dice prima.** Su alcune vetture il costruttore non abilita affatto i comandi dell'antifurto. Prima ricevevi solo un errore, identico a quello di un guasto. Ora l'integrazione ti avvisa che è il costruttore a non permettere quella funzione — così non perdi tempo a cercare un problema che non c'è.
-- **Ricarica programmata: avviso quando i giorni scelti non sono ammessi.** Alcune auto accettano solo la programmazione su tutti i giorni della settimana, altre solo su giorni scelti. Se la tua non ammette quella che l'integrazione sta per mandare, adesso lo dice prima invece di lasciarti davanti a un rifiuto senza spiegazione. **Non cambia i giorni al posto tuo**: una ricarica che parte in un giorno che non hai scelto sarebbe peggio di un errore onesto.
-- **Un chiarimento su una nostra vecchia nota, per chi legge il codice.** Una verifica approfondita ha fatto sospettare che l'orario della ricarica programmata partisse spostato di un'ora o due rispetto a quello impostato. **Il sospetto è stato controllato ed è infondato: l'orario era ed è corretto.** Nulla cambia nel funzionamento; abbiamo corretto la nota interna che aveva dato origine al dubbio.
+- **Nuovo sensore: «Partenza programmata».** L'auto ci mandava già, a ogni collegamento, il piano di partenza impostato dall'app ufficiale — orario e giorni — e noi lo buttavamo via senza guardarlo. Ora lo vedi in Home Assistant: l'orario, i giorni della settimana e se il piano è attivo o spento. **È solo una lettura**: per cambiare il piano si usa ancora l'app. Non aggiunge nessuna richiesta ai server del costruttore, perché è un dato che arrivava già.
+- **La ricarica programmata mostra anche il piano che ha davvero l'auto.** Finora l'interruttore mostrava soltanto le preferenze impostate qui dentro: se cambiavi la programmazione dall'app ufficiale, Home Assistant non lo sapeva. Adesso, quando l'auto comunica il suo piano, trovi orario, durata e giorni **come li ha lei**. Compaiono quando l'auto li manda, cioè quando qualcosa cambia: se non ci sono, non vuol dire che non ci sia un piano.
+- **Una data che non ti mostriamo, di proposito.** Il piano di partenza arriva accompagnato da un «creato il» e un «modificato il» che sembrano dire quando l'hai impostato. Non lo dicono: il costruttore li riscrive a ogni interrogazione, e infatti risultano sempre di pochi secondi fa. Li abbiamo lasciati fuori, perché un dato inventato che sembra autorevole è peggio di un dato assente.
+
+## v1.12.0 — 2026-08-10
 
 ### 🇬🇧 English
 
@@ -194,27 +196,27 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **Scheduled charging: a warning when the chosen days are not allowed.** Some cars accept scheduling on every day of the week only, others only on selected days. If yours does not accept the one the integration is about to send, it now says so beforehand instead of leaving you with an unexplained refusal. **It does not change the days for you**: a charge starting on a day you did not pick would be worse than an honest error.
 - **A clarification on an old note of ours, for those who read the code.** A thorough review raised the suspicion that scheduled charging might start one or two hours away from the time you set. **The suspicion was checked and is unfounded: the time was and is correct.** Nothing changes in how it works; we corrected the internal note that caused the doubt.
 
-## v1.11.1 — 2026-08-10
-
 ### 🇮🇹 Italiano
 
-- **Correzione alla novità di ieri: su alcune auto non si attivava affatto.** Per decidere se cambiare strada, l'integrazione guardava solo la singola funzione e non l'intera categoria. Su un'auto il cui elenco dei permessi è più corto — cioè che non elenca le singole funzioni ma nega il gruppo intero — concludeva che la strada abituale fosse aperta e non provava quella alternativa: la funzione restava rotta **proprio sulle auto per cui questa novità era stata scritta**. Ora guarda tutte e due.
-- **E quando non c'è nulla da fare, adesso te lo dice.** Se il costruttore non autorizza affatto una funzione sulla tua auto, non c'è niente da togliere e nessuna strada alternativa: prima ricevevi lo stesso errore di sempre, senza capire perché l'aggiornamento non avesse cambiato niente. Ora l'integrazione lo scrive chiaramente.
+- **Nuovo interruttore: «Disappannamento parabrezza».** L'auto sa fare due cose diverse sul vetro davanti, e finora l'integrazione ne offriva una sola. Quella che c'era già, «Sbrinamento parabrezza», **scalda il vetro** con le resistenze elettriche. Questa nuova soffia invece **l'aria del climatizzatore sul parabrezza**, che è il modo rapido per togliere la condensa. Sono comandi distinti e l'auto li tiene separati.
+- ⚠️ **Da sapere prima di usarlo: accende anche il climatizzatore** per circa 15 minuti, perché è il climatizzatore stesso a soffiare l'aria sul vetro. Non è un difetto, è come funziona sull'auto. Per lo stesso motivo, spegnere il disappannamento spegne il clima.
+- **Antifurto: se la tua auto non lo autorizza, ora te lo dice prima.** Su alcune vetture il costruttore non abilita affatto i comandi dell'antifurto. Prima ricevevi solo un errore, identico a quello di un guasto. Ora l'integrazione ti avvisa che è il costruttore a non permettere quella funzione — così non perdi tempo a cercare un problema che non c'è.
+- **Ricarica programmata: avviso quando i giorni scelti non sono ammessi.** Alcune auto accettano solo la programmazione su tutti i giorni della settimana, altre solo su giorni scelti. Se la tua non ammette quella che l'integrazione sta per mandare, adesso lo dice prima invece di lasciarti davanti a un rifiuto senza spiegazione. **Non cambia i giorni al posto tuo**: una ricarica che parte in un giorno che non hai scelto sarebbe peggio di un errore onesto.
+- **Un chiarimento su una nostra vecchia nota, per chi legge il codice.** Una verifica approfondita ha fatto sospettare che l'orario della ricarica programmata partisse spostato di un'ora o due rispetto a quello impostato. **Il sospetto è stato controllato ed è infondato: l'orario era ed è corretto.** Nulla cambia nel funzionamento; abbiamo corretto la nota interna che aveva dato origine al dubbio.
+
+## v1.11.1 — 2026-08-10
 
 ### 🇬🇧 English
 
 - **A fix to yesterday's feature: on some cars it never kicked in at all.** To decide whether to change route, the integration looked only at the individual function and not at the whole category. On a car whose permission list is shorter — one that does not list the individual functions but denies the group as a whole — it concluded the usual road was open and never tried the alternative: the function stayed broken **on exactly the cars this feature was written for**. It now looks at both.
 - **And when nothing can be done, it now says so.** If the manufacturer does not authorise a function on your car at all, there is nothing to remove and no alternative road: you used to get the same error as always, with no way to tell why the update had changed nothing. The integration now says it plainly.
 
-## v1.11.0 — 2026-08-10
-
 ### 🇮🇹 Italiano
 
-- **I comandi non si fermano più al primo ostacolo.** Ogni auto ha un elenco, deciso dal costruttore, di ciò che si può comandare a distanza — e cambia da modello a modello. Finora l'integrazione lo ignorava: se anche una sola delle funzioni che un comando porta con sé non era abilitata sulla tua auto, il costruttore rifiutava **tutto il comando**, comprese le parti che la tua auto sapeva fare benissimo. Premevi «Riscalda tutto» e non succedeva niente. Adesso l'integrazione chiede all'auto cosa le è permesso e **toglie dal comando solo i pezzi non abilitati**: il resto parte e funziona. Se qualcosa è stato saltato te lo dice, invece di lasciartelo credere fatto.
-- **E se una funzione c'è ma passa da un'altra strada, la usa.** Alcune auto abilitano il riscaldamento dei sedili o lo sbrinamento del lunotto per una via diversa da quella che l'integrazione usava sempre. Prima era un muro: il comando falliva anche se l'auto quella cosa la sapeva fare, e dall'app ufficiale funzionava. Ora, quando la strada abituale è chiusa, l'integrazione prova quella aperta — la stessa che usa l'app. Quando passa di lì si accende anche il clima: te lo scrive, così non è una sorpresa.
-- **Se qualcosa non funziona, non ti toglie niente.** Se l'elenco non si riesce a leggere — per esempio perché il servizio del costruttore non risponde — l'integrazione si comporta **esattamente come prima**, mandando il comando per intero. Nessuna funzione sparisce mai per colpa di un problema di rete.
-- **Chi ha una Omoda 9 non nota alcuna differenza:** su quell'auto tutto ciò che l'integrazione usa è già abilitato, quindi non c'è niente da togliere e niente da cambiare di strada. Stessi comandi, stessi risultati, stesse entità di prima.
-- Grazie a **ThomasMeyer1970** e alla sua Jaecoo 7, da cui è partita tutta questa indagine.
+- **Correzione alla novità di ieri: su alcune auto non si attivava affatto.** Per decidere se cambiare strada, l'integrazione guardava solo la singola funzione e non l'intera categoria. Su un'auto il cui elenco dei permessi è più corto — cioè che non elenca le singole funzioni ma nega il gruppo intero — concludeva che la strada abituale fosse aperta e non provava quella alternativa: la funzione restava rotta **proprio sulle auto per cui questa novità era stata scritta**. Ora guarda tutte e due.
+- **E quando non c'è nulla da fare, adesso te lo dice.** Se il costruttore non autorizza affatto una funzione sulla tua auto, non c'è niente da togliere e nessuna strada alternativa: prima ricevevi lo stesso errore di sempre, senza capire perché l'aggiornamento non avesse cambiato niente. Ora l'integrazione lo scrive chiaramente.
+
+## v1.11.0 — 2026-08-10
 
 ### 🇬🇧 English
 
@@ -224,27 +226,27 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **If you have an Omoda 9 you will notice no difference:** on that car everything the integration uses is already enabled, so there is nothing to remove and no road to change. Same commands, same results, same entities as before.
 - Thanks to **ThomasMeyer1970** and his Jaecoo 7, where this whole investigation started.
 
-## v1.10.1 — 2026-08-09
-
 ### 🇮🇹 Italiano
 
-- **Un messaggio d'errore che mandava fuori strada.** Quando l'auto rifiuta un comando perché il costruttore non ha abilitato quella funzione su quel veicolo, l'integrazione diceva «PIN comandi rifiutato — riconfiguralo nelle impostazioni»: si finiva a reinserire un PIN che era già giusto, senza risolvere niente. Ora dice chiaramente che **non è il PIN** e che quella funzione non è autorizzata su quell'auto. Il messaggio è scritto in italiano e in inglese, così si legge ovunque. Per il resto non cambia nulla: i comandi che funzionavano continuano a funzionare esattamente come prima. Il problema è emerso grazie a **ThomasMeyer1970**, che ha una Jaecoo 7 dove alcuni comandi di comfort non sono abilitati dal costruttore.
-- **Il progetto si è trasferito in un'organizzazione condivisa su GitHub.** È cambiato l'indirizzo del progetto: i collegamenti alla documentazione e alla segnalazione dei problemi — quelli che trovi nella scheda dell'integrazione dentro Home Assistant — ora portano al nuovo indirizzo. Da parte tua non c'è niente da fare: l'aggiornamento da HACS continua a funzionare come sempre e la tua configurazione resta intatta.
+- **I comandi non si fermano più al primo ostacolo.** Ogni auto ha un elenco, deciso dal costruttore, di ciò che si può comandare a distanza — e cambia da modello a modello. Finora l'integrazione lo ignorava: se anche una sola delle funzioni che un comando porta con sé non era abilitata sulla tua auto, il costruttore rifiutava **tutto il comando**, comprese le parti che la tua auto sapeva fare benissimo. Premevi «Riscalda tutto» e non succedeva niente. Adesso l'integrazione chiede all'auto cosa le è permesso e **toglie dal comando solo i pezzi non abilitati**: il resto parte e funziona. Se qualcosa è stato saltato te lo dice, invece di lasciartelo credere fatto.
+- **E se una funzione c'è ma passa da un'altra strada, la usa.** Alcune auto abilitano il riscaldamento dei sedili o lo sbrinamento del lunotto per una via diversa da quella che l'integrazione usava sempre. Prima era un muro: il comando falliva anche se l'auto quella cosa la sapeva fare, e dall'app ufficiale funzionava. Ora, quando la strada abituale è chiusa, l'integrazione prova quella aperta — la stessa che usa l'app. Quando passa di lì si accende anche il clima: te lo scrive, così non è una sorpresa.
+- **Se qualcosa non funziona, non ti toglie niente.** Se l'elenco non si riesce a leggere — per esempio perché il servizio del costruttore non risponde — l'integrazione si comporta **esattamente come prima**, mandando il comando per intero. Nessuna funzione sparisce mai per colpa di un problema di rete.
+- **Chi ha una Omoda 9 non nota alcuna differenza:** su quell'auto tutto ciò che l'integrazione usa è già abilitato, quindi non c'è niente da togliere e niente da cambiare di strada. Stessi comandi, stessi risultati, stesse entità di prima.
+- Grazie a **ThomasMeyer1970** e alla sua Jaecoo 7, da cui è partita tutta questa indagine.
+
+## v1.10.1 — 2026-08-09
 
 ### 🇬🇧 English
 
 - **An error message that sent you the wrong way.** When the car refuses a command because the manufacturer has not enabled that function on that vehicle, the integration used to say "command PIN rejected — reconfigure it in the settings": you ended up re-entering a PIN that was already correct, and nothing got fixed. It now says clearly that **this is not your PIN** and that the function is not authorised on that car. The message is written in both Italian and English, so it reads anywhere. Nothing else changes: commands that worked keep working exactly as before. The problem came to light thanks to **ThomasMeyer1970**, who has a Jaecoo 7 on which some comfort commands are not enabled by the manufacturer.
 - **The project has moved to a shared organisation on GitHub.** The project address has changed: the links to the documentation and to issue reporting — the ones on the integration's page inside Home Assistant — now point to the new address. There is nothing for you to do: updating through HACS keeps working exactly as before and your setup is left untouched.
 
-## v1.10.0 — 2026-08-09
-
 ### 🇮🇹 Italiano
 
-- **Ora l'integrazione si adatta alle auto solo elettriche.** Fin qui era tarata sull'Omoda 9, che ha anche il motore a benzina: su un'auto puramente elettrica comparivano lo stesso i contatori del carburante, e restavano vuoti per sempre. Adesso l'integrazione chiede all'auto che tipo di motore ha, e si regola da sola: se è solo elettrica quei contatori non compaiono più, e al loro posto arrivano la **potenza di ricarica**, l'**autonomia dichiarata WLTP** e l'**efficienza**. L'autonomia totale, che sulle ibride è elettrica più benzina, su un'elettrica è semplicemente l'autonomia elettrica.
-- **La temperatura del clima usa i limiti veri della tua auto.** Prima il cursore era fisso da 16 a 30 gradi per tutti; ora, quando l'auto li dichiara, si usano i suoi (alcuni modelli hanno estremi diversi, o mezzo grado di scatto invece di uno).
-- **La velocità si può vedere in miglia orarie.** Per chi usa Home Assistant con le unità britanniche: prima era bloccata in km/h.
-- **Chi ha una Omoda 9 o una Jaecoo ibrida non nota alcuna differenza:** l'adattamento scatta solo quando l'auto dichiara esplicitamente di essere elettrica, mai per esclusione. In caso di dubbio resta tutto com'era.
-- Grazie a **JackRonan**, autore della versione inglese dell'integrazione ([omoda-jaecoo-ha](https://github.com/JackRonan/omoda-jaecoo-ha)), che ha portato avanti il lavoro sull'Omoda E5 e da cui arrivano queste migliorie.
+- **Un messaggio d'errore che mandava fuori strada.** Quando l'auto rifiuta un comando perché il costruttore non ha abilitato quella funzione su quel veicolo, l'integrazione diceva «PIN comandi rifiutato — riconfiguralo nelle impostazioni»: si finiva a reinserire un PIN che era già giusto, senza risolvere niente. Ora dice chiaramente che **non è il PIN** e che quella funzione non è autorizzata su quell'auto. Il messaggio è scritto in italiano e in inglese, così si legge ovunque. Per il resto non cambia nulla: i comandi che funzionavano continuano a funzionare esattamente come prima. Il problema è emerso grazie a **ThomasMeyer1970**, che ha una Jaecoo 7 dove alcuni comandi di comfort non sono abilitati dal costruttore.
+- **Il progetto si è trasferito in un'organizzazione condivisa su GitHub.** È cambiato l'indirizzo del progetto: i collegamenti alla documentazione e alla segnalazione dei problemi — quelli che trovi nella scheda dell'integrazione dentro Home Assistant — ora portano al nuovo indirizzo. Da parte tua non c'è niente da fare: l'aggiornamento da HACS continua a funzionare come sempre e la tua configurazione resta intatta.
+
+## v1.10.0 — 2026-08-09
 
 ### 🇬🇧 English
 
@@ -254,48 +256,45 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **If you have an Omoda 9 or a hybrid Jaecoo you will notice no difference:** the adaptation only kicks in when the car explicitly declares itself electric, never by assumption. When in doubt, everything stays as it was.
 - Thanks to **JackRonan**, author of the English version of this integration ([omoda-jaecoo-ha](https://github.com/JackRonan/omoda-jaecoo-ha)), who carried the work forward on the Omoda E5 and from whose fork these improvements come.
 
-## v1.9.0 — 2026-08-02
-
 ### 🇮🇹 Italiano
 
-- **Ora puoi cambiare come ricevere il codice.** In «Configura» scegli se farti mandare il codice via **email** o via **SMS**, e puoi correggere l'indirizzo o il numero. Prima il canale restava quello scelto alla prima configurazione e l'unico modo di cambiarlo era eliminare e riaggiungere l'integrazione.
+- **Ora l'integrazione si adatta alle auto solo elettriche.** Fin qui era tarata sull'Omoda 9, che ha anche il motore a benzina: su un'auto puramente elettrica comparivano lo stesso i contatori del carburante, e restavano vuoti per sempre. Adesso l'integrazione chiede all'auto che tipo di motore ha, e si regola da sola: se è solo elettrica quei contatori non compaiono più, e al loro posto arrivano la **potenza di ricarica**, l'**autonomia dichiarata WLTP** e l'**efficienza**. L'autonomia totale, che sulle ibride è elettrica più benzina, su un'elettrica è semplicemente l'autonomia elettrica.
+- **La temperatura del clima usa i limiti veri della tua auto.** Prima il cursore era fisso da 16 a 30 gradi per tutti; ora, quando l'auto li dichiara, si usano i suoi (alcuni modelli hanno estremi diversi, o mezzo grado di scatto invece di uno).
+- **La velocità si può vedere in miglia orarie.** Per chi usa Home Assistant con le unità britanniche: prima era bloccata in km/h.
+- **Chi ha una Omoda 9 o una Jaecoo ibrida non nota alcuna differenza:** l'adattamento scatta solo quando l'auto dichiara esplicitamente di essere elettrica, mai per esclusione. In caso di dubbio resta tutto com'era.
+- Grazie a **JackRonan**, autore della versione inglese dell'integrazione ([omoda-jaecoo-ha](https://github.com/JackRonan/omoda-jaecoo-ha)), che ha portato avanti il lavoro sull'Omoda E5 e da cui arrivano queste migliorie.
+
+## v1.9.0 — 2026-08-02
 
 ### 🇬🇧 English
 
 - **You can now change how you receive the code.** Under "Configure" you choose whether the code is sent by **email** or by **SMS**, and you can correct the address or the number. Before, the channel stayed the one picked at first setup, and the only way to change it was to delete and re-add the integration.
 
-## v1.8.0 — 2026-08-02
-
 ### 🇮🇹 Italiano
 
-- **Ora si può accedere con il numero di telefono.** Se il tuo account Omoda/Jaecoo è registrato con un numero invece che con un indirizzo email, scegli «Accedi con numero di telefono»: il codice di verifica ti arriva via **SMS**.
+- **Ora puoi cambiare come ricevere il codice.** In «Configura» scegli se farti mandare il codice via **email** o via **SMS**, e puoi correggere l'indirizzo o il numero. Prima il canale restava quello scelto alla prima configurazione e l'unico modo di cambiarlo era eliminare e riaggiungere l'integrazione.
+
+## v1.8.0 — 2026-08-02
 
 ### 🇬🇧 English
 
 - **You can now sign in with your phone number.** If your Omoda/Jaecoo account is registered with a phone number instead of an email address, pick "Sign in with phone number": the verification code arrives by **SMS**.
 
-## v1.7.2 — 2026-08-02
-
 ### 🇮🇹 Italiano
 
-- **L'integrazione ha finalmente il suo logo.** Il marchio OMODA | JAECOO compare adesso in HACS e nella pagina delle integrazioni di Home Assistant, al posto del riquadro vuoto. C'è anche la versione chiara per chi usa il tema scuro, così si vede bene in entrambi i casi.
+- **Ora si può accedere con il numero di telefono.** Se il tuo account Omoda/Jaecoo è registrato con un numero invece che con un indirizzo email, scegli «Accedi con numero di telefono»: il codice di verifica ti arriva via **SMS**.
+
+## v1.7.2 — 2026-08-02
 
 ### 🇬🇧 English
 
 - **The integration finally has its own logo.** The OMODA | JAECOO mark now shows up in HACS and on the Home Assistant integrations page, instead of an empty box. A light version is included for anyone on a dark theme, so it reads well either way.
 
-## v1.7.1 — 2026-08-02
-
 ### 🇮🇹 Italiano
 
-- **La carica della batteria non torna più indietro da sola.** Appena finita la ricarica l'auto spegne l'impianto elettrico e manda un'ultima lettura "a vuoto": la percentuale che contiene è sbagliata e restava lì per ore. Capitava di vedere 97% in Home Assistant mentre sull'auto c'era 100%. Ora quelle letture vengono riconosciute e scartate.
-- **Stessa cosa per l'autonomia.** L'autonomia elettrica non scende più a 0 km, e quella totale non perde di colpo un centinaio di chilometri, quando l'auto è solo a riposo.
-- **Quando un dato manca, si tiene l'ultimo vero.** Prima in quei casi poteva ricomparire un valore vecchio, fermo all'ultimo riavvio di Home Assistant: ora si torna sempre all'ultima lettura davvero arrivata dall'auto.
-- **«Raffredda tutto» e «Riscalda tutto» partono molto prima.** Se l'auto è già sveglia il comando parte quasi subito, invece di aspettare quasi un minuto come faceva sempre: quell'attesa serviva solo a svegliare un'auto addormentata, e ora si fa soltanto quando serve davvero.
-- **Basta l'errore «auto occupata» quando si preme due volte.** Chi non vedeva succedere nulla ripremeva il tasto, i due comandi si accavallavano e l'auto rifiutava il secondo. Ora il secondo comando aspetta sul serio il suo turno.
-- **Il messaggio finale dice le cose come stanno.** Quando l'auto avvia il clima ma non i sedili ventilati, ora si legge che il comando è riuscito solo in parte e quali parti hanno fatto storie, invece di un allarme generico seguito da una sfilza di numeri.
-- **Niente più falso allarme quando si spegne il clima.** Spegnendo, l'auto manda sempre una nota sul clima che non segnala alcun guasto: veniva scambiata per un problema, così compariva un avviso anche quando tutto era andato benissimo. Ora quella nota, da sola, non fa più scattare nessun allarme.
-- **I sedili hanno un nome.** Nel riepilogo di un comando riuscito a metà si legge «sedile guida riscaldato» o «sedile guida ventilato» invece di un anonimo «modulo 4».
+- **L'integrazione ha finalmente il suo logo.** Il marchio OMODA | JAECOO compare adesso in HACS e nella pagina delle integrazioni di Home Assistant, al posto del riquadro vuoto. C'è anche la versione chiara per chi usa il tema scuro, così si vede bene in entrambi i casi.
+
+## v1.7.1 — 2026-08-02
 
 ### 🇬🇧 English
 
@@ -308,17 +307,18 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **No more false alarm when you switch the climate off.** On every switch-off the car sends a note about the climate control that reports no fault at all: it was being read as a problem, so a warning appeared even when everything had gone perfectly. That note on its own no longer raises any alarm.
 - **The seats have names.** In the summary of a partly successful command you now read "driver seat heating" or "driver seat ventilation" instead of an anonymous "module 4".
 
-## v1.7.0 — 2026-07-22
-
 ### 🇮🇹 Italiano
 
-- **Basta codici di verifica non richiesti.** Quando il collegamento con l'auto scadeva, l'integrazione spediva un'email col codice da sola — e lo rifaceva a ogni riavvio di Home Assistant. Ora nessun codice parte se non lo chiedi tu.
-- **Riautenticazione senza vicoli ciechi.** La pagina ti fa scegliere fra «Inviami un codice nuovo» e «Ho già un codice», e dopo un codice sbagliato ti riporta lì: puoi sempre chiederne un altro.
-- **Un avviso quando serve il tuo intervento.** Se il collegamento scade compare una notifica che spiega cosa fare, e sparisce da sola quando tutto torna a posto.
-- **Collegamento più stabile.** Si rinnova con ore di anticipo invece che all'ultimo momento, non insiste quando il servizio dell'auto rifiuta, e una connessione ballerina non ti fa più sprecare un codice.
-- **Il pulsante «Sveglia auto» torna a funzionare.** In certi casi rispondeva «auto già sveglia» senza fare nulla.
-- **Sensori più onesti.** «Dati auto aggiornati» ora segna quando i dati cambiano davvero; «Autonomia combinata» era in realtà l'autonomia a benzina in miglia ed è stata rinominata e corretta; «Tempo di ricarica residuo» torna a "sconosciuto" fuori dalla ricarica.
-- **Più riservatezza.** La posizione dell'auto non finisce più nello storico, nel file di diagnostica né nel registro tecnico: continua ad alimentare solo la mappa.
+- **La carica della batteria non torna più indietro da sola.** Appena finita la ricarica l'auto spegne l'impianto elettrico e manda un'ultima lettura "a vuoto": la percentuale che contiene è sbagliata e restava lì per ore. Capitava di vedere 97% in Home Assistant mentre sull'auto c'era 100%. Ora quelle letture vengono riconosciute e scartate.
+- **Stessa cosa per l'autonomia.** L'autonomia elettrica non scende più a 0 km, e quella totale non perde di colpo un centinaio di chilometri, quando l'auto è solo a riposo.
+- **Quando un dato manca, si tiene l'ultimo vero.** Prima in quei casi poteva ricomparire un valore vecchio, fermo all'ultimo riavvio di Home Assistant: ora si torna sempre all'ultima lettura davvero arrivata dall'auto.
+- **«Raffredda tutto» e «Riscalda tutto» partono molto prima.** Se l'auto è già sveglia il comando parte quasi subito, invece di aspettare quasi un minuto come faceva sempre: quell'attesa serviva solo a svegliare un'auto addormentata, e ora si fa soltanto quando serve davvero.
+- **Basta l'errore «auto occupata» quando si preme due volte.** Chi non vedeva succedere nulla ripremeva il tasto, i due comandi si accavallavano e l'auto rifiutava il secondo. Ora il secondo comando aspetta sul serio il suo turno.
+- **Il messaggio finale dice le cose come stanno.** Quando l'auto avvia il clima ma non i sedili ventilati, ora si legge che il comando è riuscito solo in parte e quali parti hanno fatto storie, invece di un allarme generico seguito da una sfilza di numeri.
+- **Niente più falso allarme quando si spegne il clima.** Spegnendo, l'auto manda sempre una nota sul clima che non segnala alcun guasto: veniva scambiata per un problema, così compariva un avviso anche quando tutto era andato benissimo. Ora quella nota, da sola, non fa più scattare nessun allarme.
+- **I sedili hanno un nome.** Nel riepilogo di un comando riuscito a metà si legge «sedile guida riscaldato» o «sedile guida ventilato» invece di un anonimo «modulo 4».
+
+## v1.7.0 — 2026-07-22
 
 ### 🇬🇧 English
 
@@ -330,7 +330,33 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **More honest sensors.** "Car data updated" now marks when the data really changes; "Combined range" was actually the petrol range in miles and has been renamed and corrected; "Remaining charge time" returns to "unknown" when not charging.
 - **More privacy.** The car's location no longer ends up in history, in the diagnostics file or in the technical log: it only feeds the map.
 
+### 🇮🇹 Italiano
+
+- **Basta codici di verifica non richiesti.** Quando il collegamento con l'auto scadeva, l'integrazione spediva un'email col codice da sola — e lo rifaceva a ogni riavvio di Home Assistant. Ora nessun codice parte se non lo chiedi tu.
+- **Riautenticazione senza vicoli ciechi.** La pagina ti fa scegliere fra «Inviami un codice nuovo» e «Ho già un codice», e dopo un codice sbagliato ti riporta lì: puoi sempre chiederne un altro.
+- **Un avviso quando serve il tuo intervento.** Se il collegamento scade compare una notifica che spiega cosa fare, e sparisce da sola quando tutto torna a posto.
+- **Collegamento più stabile.** Si rinnova con ore di anticipo invece che all'ultimo momento, non insiste quando il servizio dell'auto rifiuta, e una connessione ballerina non ti fa più sprecare un codice.
+- **Il pulsante «Sveglia auto» torna a funzionare.** In certi casi rispondeva «auto già sveglia» senza fare nulla.
+- **Sensori più onesti.** «Dati auto aggiornati» ora segna quando i dati cambiano davvero; «Autonomia combinata» era in realtà l'autonomia a benzina in miglia ed è stata rinominata e corretta; «Tempo di ricarica residuo» torna a "sconosciuto" fuori dalla ricarica.
+- **Più riservatezza.** La posizione dell'auto non finisce più nello storico, nel file di diagnostica né nel registro tecnico: continua ad alimentare solo la mappa.
+
 ## v1.6.1 — 2026-07-20
+
+### 🇬🇧 English
+
+- **Cleaner startup and faster Home Assistant shutdown.** At startup the integration
+  loaded and then immediately reloaded itself a second time, while fetching your car's
+  name. That was wasted work, and it could also **slow down Home Assistant's shutdown or
+  restart** if it happened at the wrong moment. The integration now reloads **only when
+  it actually needs to**, that is when you change the settings yourself.
+- Changing the command PIN also caused two reloads in a row: now just one. Nothing
+  changes in what you see, it is simply tidier and faster.
+- **Fixed a defect in the internal diagnostic tooling** — the tooling the integration's
+  developer can switch on to investigate a reported problem. In some cases the file it
+  produces could contain the **car's location** instead of omitting it as intended. That
+  tooling stays switched off unless deliberately enabled, so in all likelihood this never
+  affected you — but if you were ever asked to send a diagnostic file, from this version
+  it is properly redacted again, as promised.
 
 ### 🇮🇹 Italiano
 
@@ -349,23 +375,28 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
   quindi con ogni probabilità non ti ha mai riguardato — ma se ti fosse mai stato chiesto
   di inviare un file di diagnostica, da questa versione è di nuovo oscurato come promesso.
 
+## v1.6.0 — 2026-07-20
+
 ### 🇬🇧 English
 
-- **Cleaner startup and faster Home Assistant shutdown.** At startup the integration
-  loaded and then immediately reloaded itself a second time, while fetching your car's
-  name. That was wasted work, and it could also **slow down Home Assistant's shutdown or
-  restart** if it happened at the wrong moment. The integration now reloads **only when
-  it actually needs to**, that is when you change the settings yourself.
-- Changing the command PIN also caused two reloads in a row: now just one. Nothing
-  changes in what you see, it is simply tidier and faster.
-- **Fixed a defect in the internal diagnostic tooling** — the tooling the integration's
-  developer can switch on to investigate a reported problem. In some cases the file it
-  produces could contain the **car's location** instead of omitting it as intended. That
-  tooling stays switched off unless deliberately enabled, so in all likelihood this never
-  affected you — but if you were ever asked to send a diagnostic file, from this version
-  it is properly redacted again, as promised.
-
-## v1.6.0 — 2026-07-20
+- **Major internal clean-up: nothing changes in what you see and use.** No new features,
+  no buttons moved, no entities added or removed. What changed is how the integration is
+  written under the hood.
+- **Why we did it.** Some serious problems seen in recent months — the PIN locking itself
+  out, automatic updates that kept polling the car even when switched off, the wrong error
+  message sending you to change a PIN that was actually correct — had been fixed one by
+  one. We have now changed the foundations so that this *kind* of problem **can no longer
+  happen at all**, rather than fixing it each time it appears.
+- **The most important change is invisible.** The integration now has a battery of **184
+  automated checks** that verify on their own, in a few seconds, that everything works:
+  commands, sign-in, telemetry, warnings, even the exact count of the 105 entities.
+  Previously the only way to test a change was **to try it on the real car**. That is no
+  longer needed: future changes arrive already verified.
+- **Groundwork for multiple cars on the same Home Assistant.** Not enabled yet, but the
+  technical obstacle that prevented it has been removed.
+- **A little more privacy.** Your PIN and email address no longer pass through an area of
+  memory that other installed integrations could read.
+- **You can update safely:** behaviour is identical to before.
 
 ### 🇮🇹 Italiano
 
@@ -389,34 +420,7 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
   zona di memoria che altre integrazioni installate potevano leggere.
 - **Puoi aggiornare tranquillamente:** il comportamento è identico a prima.
 
-### 🇬🇧 English
-
-- **Major internal clean-up: nothing changes in what you see and use.** No new features,
-  no buttons moved, no entities added or removed. What changed is how the integration is
-  written under the hood.
-- **Why we did it.** Some serious problems seen in recent months — the PIN locking itself
-  out, automatic updates that kept polling the car even when switched off, the wrong error
-  message sending you to change a PIN that was actually correct — had been fixed one by
-  one. We have now changed the foundations so that this *kind* of problem **can no longer
-  happen at all**, rather than fixing it each time it appears.
-- **The most important change is invisible.** The integration now has a battery of **184
-  automated checks** that verify on their own, in a few seconds, that everything works:
-  commands, sign-in, telemetry, warnings, even the exact count of the 105 entities.
-  Previously the only way to test a change was **to try it on the real car**. That is no
-  longer needed: future changes arrive already verified.
-- **Groundwork for multiple cars on the same Home Assistant.** Not enabled yet, but the
-  technical obstacle that prevented it has been removed.
-- **A little more privacy.** Your PIN and email address no longer pass through an area of
-  memory that other installed integrations could read.
-- **You can update safely:** behaviour is identical to before.
-
 ## v1.5.29 — 2026-07-19
-
-### 🇮🇹 Italiano
-
-- **Aggiornamento di manutenzione: per te non cambia nulla.** Nessuna nuova funzione e nessuna
-  correzione visibile: solo una rifinitura agli strumenti interni di chi sviluppa l'integrazione.
-  Restano spenti e non influiscono sul funzionamento: puoi aggiornare tranquillamente.
 
 ### 🇬🇧 English
 
@@ -424,14 +428,13 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
   refinement to the integration developer's internal tooling. It stays switched off and does not
   affect how anything works: you can update safely.
 
-## v1.5.28 — 2026-07-19
-
 ### 🇮🇹 Italiano
 
-- **Aggiornamento di manutenzione: per te non cambia nulla.** Non ci sono nuove funzioni né
-  correzioni visibili. Questa versione aggiunge solo strumenti interni che aiutano chi sviluppa
-  l'integrazione a capire meglio i problemi segnalati. Restano spenti e non influiscono in alcun
-  modo sul funzionamento né sui consumi: puoi aggiornare tranquillamente.
+- **Aggiornamento di manutenzione: per te non cambia nulla.** Nessuna nuova funzione e nessuna
+  correzione visibile: solo una rifinitura agli strumenti interni di chi sviluppa l'integrazione.
+  Restano spenti e non influiscono sul funzionamento: puoi aggiornare tranquillamente.
+
+## v1.5.28 — 2026-07-19
 
 ### 🇬🇧 English
 
@@ -440,7 +443,42 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
   problems. It stays switched off and has no effect whatsoever on behaviour or resource usage —
   you can update safely.
 
+### 🇮🇹 Italiano
+
+- **Aggiornamento di manutenzione: per te non cambia nulla.** Non ci sono nuove funzioni né
+  correzioni visibili. Questa versione aggiunge solo strumenti interni che aiutano chi sviluppa
+  l'integrazione a capire meglio i problemi segnalati. Restano spenti e non influiscono in alcun
+  modo sul funzionamento né sui consumi: puoi aggiornare tranquillamente.
+
 ## v1.5.27 — 2026-07-19
+
+### 🇬🇧 English
+
+- **No more "please sign in again" when it's just the internet acting up.** If the connection to
+  the car's server dropped for a moment, you could be asked to sign in again with a new email
+  code — pointless, since the session was still fine. The integration now tells a genuinely
+  expired session apart from a passing network glitch, and only bothers you when it really matters.
+- **One less sign-in to do by hand.** In some cases the session could have been renewed silently on
+  its own, but the integration didn't try and asked you for the email code straight away. It now
+  attempts the automatic renewal first: often you won't have to do anything.
+- **No more false "wrong PIN".** When the car refused a command for reasons that have nothing to do
+  with the PIN (for example, the account lacks permissions on that vehicle), you were still told
+  the PIN was wrong and asked to change it. Worse, that refusal counted as a failed attempt and
+  pushed you closer to having your PIN locked. Every refusal is now recognised for what it is: the
+  message states the real cause, a correct PIN is no longer questioned, and attempts are no longer
+  used up because of errors that aren't yours.
+- **Your PIN is no longer shown in plain text.** On the screens for changing the command PIN, the
+  code was displayed in full. It is now masked with dots, like any normal password.
+- **The email code is better protected.** Your email address and verification code are no longer
+  passed in a way that, on some systems, could make them visible to other running programs. Also,
+  when you shut down or remove the integration, the PIN and email no longer linger in memory.
+- **The diagnostics file no longer reveals where you keep your certificates.** If you send it in to
+  get help, the folder path (which often contains your username) is now hidden, just as your email,
+  VIN and location already were.
+- **The "Car data updated" sensor name is now translated** into both Italian and English, like all
+  the others.
+- **For those helping us track down problems:** you can now ask Home Assistant for the integration's
+  detailed logs from its own page, without editing configuration files by hand.
 
 ### 🇮🇹 Italiano
 
@@ -471,57 +509,7 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **Per chi ci aiuta a trovare i problemi:** ora è possibile chiedere a Home Assistant i log
   dettagliati dell'integrazione dalla sua pagina, senza smanettare nei file di configurazione.
 
-### 🇬🇧 English
-
-- **No more "please sign in again" when it's just the internet acting up.** If the connection to
-  the car's server dropped for a moment, you could be asked to sign in again with a new email
-  code — pointless, since the session was still fine. The integration now tells a genuinely
-  expired session apart from a passing network glitch, and only bothers you when it really matters.
-- **One less sign-in to do by hand.** In some cases the session could have been renewed silently on
-  its own, but the integration didn't try and asked you for the email code straight away. It now
-  attempts the automatic renewal first: often you won't have to do anything.
-- **No more false "wrong PIN".** When the car refused a command for reasons that have nothing to do
-  with the PIN (for example, the account lacks permissions on that vehicle), you were still told
-  the PIN was wrong and asked to change it. Worse, that refusal counted as a failed attempt and
-  pushed you closer to having your PIN locked. Every refusal is now recognised for what it is: the
-  message states the real cause, a correct PIN is no longer questioned, and attempts are no longer
-  used up because of errors that aren't yours.
-- **Your PIN is no longer shown in plain text.** On the screens for changing the command PIN, the
-  code was displayed in full. It is now masked with dots, like any normal password.
-- **The email code is better protected.** Your email address and verification code are no longer
-  passed in a way that, on some systems, could make them visible to other running programs. Also,
-  when you shut down or remove the integration, the PIN and email no longer linger in memory.
-- **The diagnostics file no longer reveals where you keep your certificates.** If you send it in to
-  get help, the folder path (which often contains your username) is now hidden, just as your email,
-  VIN and location already were.
-- **The "Car data updated" sensor name is now translated** into both Italian and English, like all
-  the others.
-- **For those helping us track down problems:** you can now ask Home Assistant for the integration's
-  detailed logs from its own page, without editing configuration files by hand.
-
 ## v1.5.26 — 2026-07-19
-
-### 🇮🇹 Italiano
-
-- **Meno rischio di bloccare il PIN dell'auto.** Se due richieste partivano nello stesso momento
-  (per esempio premi "Sveglia" due volte, o un comando mentre l'auto si sta svegliando), potevano
-  provare il codice di sicurezza in parallelo e "consumare" più tentativi del previsto: con un PIN
-  sbagliato si rischiava di avvicinarsi al blocco dell'account. Ora le richieste si mettono in fila
-  e viene rispettato il limite di tentativi che l'integrazione si è data.
-- **Reinserire lo stesso PIN ora sblocca davvero.** Se dopo un errore riconfermavi il PIN identico
-  a prima (perché in realtà il problema non era il PIN), il blocco di sicurezza restava attivo e i
-  comandi continuavano a non partire per diversi minuti. Ora, ogni volta che confermi il PIN
-  — dall'avviso di riparazione o dalle impostazioni — si riparte puliti.
-- **Se la sveglia dell'auto fallisce, ora te lo dice.** Quando il tentativo di risveglio non
-  riusciva per PIN o sessione scaduta, l'errore restava nascosto nei log: nessun avviso, nessuna
-  richiesta di reinserire il codice. Ora compare l'avviso giusto, esattamente come quando premi un
-  pulsante: correggi il PIN o rifai l'accesso e riprovi.
-- **Niente più letture in sottofondo dopo aver spento l'integrazione.** Se ricaricavi o rimuovevi
-  l'integrazione mentre l'auto era in carica, un controllo automatico poteva restare acceso e
-  continuare a interrogare il server anche dopo. Ora si ferma insieme a tutto il resto.
-- **L'interruttore "Aggiornamento automatico" ora ferma tutto.** Spegnendolo mentre l'auto era
-  sotto carica, il controllo ravvicinato della ricarica proseguiva lo stesso. Ora quando è spento
-  l'integrazione non contatta più l'auto da sola, come ci si aspetta.
 
 ### 🇬🇧 English
 
@@ -545,36 +533,29 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
   did not stop the close-interval charge tracking. Now, when it is off, the integration no longer
   contacts the car on its own — as you would expect.
 
-## v1.5.25 — 2026-07-11
-
 ### 🇮🇹 Italiano
 
-- **Comandi più veloci.** Prima ogni comando rifaceva da capo la verifica del PIN col server: ora
-  l'autorizzazione ottenuta viene riusata per una decina di minuti, quindi la maggior parte dei
-  comandi parte subito. Se l'auto la rifiuta perché scaduta, l'integrazione la rinnova e riprova
-  da sola, senza mostrarti un errore.
-- **Niente più "un altro comando è in corso".** L'auto esegue un comando alla volta: prima, se ne
-  premevi un secondo mentre il primo era in volo, veniva rifiutato con un errore. Ora **si mette in
-  coda** e parte da solo appena l'auto ha confermato il precedente.
-- **Sicurezza e riservatezza.** Tre correzioni: l'integrazione non scrive più su disco i dati grezzi
-  dell'auto (che contenevano telaio e posizione GPS); il file di diagnostica che puoi condividere per
-  chiedere aiuto **non contiene più il numero di telaio**; i file con le credenziali di accesso sono
-  ora leggibili solo dal proprietario.
-- **Configurazione iniziale: correggere l'email adesso funziona.** Se sbagliavi a digitare l'email,
-  ogni nuovo tentativo continuava a usare quella vecchia e falliva finché non riavviavi Home
-  Assistant. Ora ogni tentativo usa l'email che hai appena scritto. In più, se il codice non parte,
-  ora **vedi scritto il motivo** sotto al modulo (prima non appariva da nessuna parte).
-- **Basta codice vecchio dopo un aggiornamento.** In certi casi, dopo un update, Home Assistant
-  continuava a far girare la versione precedente di alcune parti interne. Ora vengono ricaricate
-  sempre da zero: aggiornare e riavviare basta.
-- **Tolto un doppione tra gli indicatori del motore.** C'erano due voci per lo stato del motore
-  ("Motore" e "Motore acceso") che mostravano la stessa identica informazione: ne resta una sola
-  ("Motore"), quella storica. Nessuna funzione persa, solo un po' di ordine in più.
-- **Diagnosi più precisa quando un comando viene rifiutato per il PIN.** Quando l'auto non accetta
-  il codice di sicurezza dei comandi, ora l'integrazione **mostra e registra il codice esatto**
-  restituito dal server. Serve a distinguere con certezza un vero "PIN sbagliato" da altre cause
-  (permessi del veicolo, problema temporaneo del server): utile se, dopo aver corretto il PIN, i
-  comandi continuassero a non partire.
+- **Meno rischio di bloccare il PIN dell'auto.** Se due richieste partivano nello stesso momento
+  (per esempio premi "Sveglia" due volte, o un comando mentre l'auto si sta svegliando), potevano
+  provare il codice di sicurezza in parallelo e "consumare" più tentativi del previsto: con un PIN
+  sbagliato si rischiava di avvicinarsi al blocco dell'account. Ora le richieste si mettono in fila
+  e viene rispettato il limite di tentativi che l'integrazione si è data.
+- **Reinserire lo stesso PIN ora sblocca davvero.** Se dopo un errore riconfermavi il PIN identico
+  a prima (perché in realtà il problema non era il PIN), il blocco di sicurezza restava attivo e i
+  comandi continuavano a non partire per diversi minuti. Ora, ogni volta che confermi il PIN
+  — dall'avviso di riparazione o dalle impostazioni — si riparte puliti.
+- **Se la sveglia dell'auto fallisce, ora te lo dice.** Quando il tentativo di risveglio non
+  riusciva per PIN o sessione scaduta, l'errore restava nascosto nei log: nessun avviso, nessuna
+  richiesta di reinserire il codice. Ora compare l'avviso giusto, esattamente come quando premi un
+  pulsante: correggi il PIN o rifai l'accesso e riprovi.
+- **Niente più letture in sottofondo dopo aver spento l'integrazione.** Se ricaricavi o rimuovevi
+  l'integrazione mentre l'auto era in carica, un controllo automatico poteva restare acceso e
+  continuare a interrogare il server anche dopo. Ora si ferma insieme a tutto il resto.
+- **L'interruttore "Aggiornamento automatico" ora ferma tutto.** Spegnendolo mentre l'auto era
+  sotto carica, il controllo ravvicinato della ricarica proseguiva lo stesso. Ora quando è spento
+  l'integrazione non contatta più l'auto da sola, come ci si aspetta.
+
+## v1.5.25 — 2026-07-11
 
 ### 🇬🇧 English
 
@@ -613,7 +594,53 @@ state riportate qui. Grazie di cuore per averle trovate, risolte e condivise. �
 this release (command speed, queueing, security and privacy fixes, setup, code reloading after an
 update) come from **JackRonan**'s work on his English fork, and were ported back here. Thank you!*
 
+### 🇮🇹 Italiano
+
+- **Comandi più veloci.** Prima ogni comando rifaceva da capo la verifica del PIN col server: ora
+  l'autorizzazione ottenuta viene riusata per una decina di minuti, quindi la maggior parte dei
+  comandi parte subito. Se l'auto la rifiuta perché scaduta, l'integrazione la rinnova e riprova
+  da sola, senza mostrarti un errore.
+- **Niente più "un altro comando è in corso".** L'auto esegue un comando alla volta: prima, se ne
+  premevi un secondo mentre il primo era in volo, veniva rifiutato con un errore. Ora **si mette in
+  coda** e parte da solo appena l'auto ha confermato il precedente.
+- **Sicurezza e riservatezza.** Tre correzioni: l'integrazione non scrive più su disco i dati grezzi
+  dell'auto (che contenevano telaio e posizione GPS); il file di diagnostica che puoi condividere per
+  chiedere aiuto **non contiene più il numero di telaio**; i file con le credenziali di accesso sono
+  ora leggibili solo dal proprietario.
+- **Configurazione iniziale: correggere l'email adesso funziona.** Se sbagliavi a digitare l'email,
+  ogni nuovo tentativo continuava a usare quella vecchia e falliva finché non riavviavi Home
+  Assistant. Ora ogni tentativo usa l'email che hai appena scritto. In più, se il codice non parte,
+  ora **vedi scritto il motivo** sotto al modulo (prima non appariva da nessuna parte).
+- **Basta codice vecchio dopo un aggiornamento.** In certi casi, dopo un update, Home Assistant
+  continuava a far girare la versione precedente di alcune parti interne. Ora vengono ricaricate
+  sempre da zero: aggiornare e riavviare basta.
+- **Tolto un doppione tra gli indicatori del motore.** C'erano due voci per lo stato del motore
+  ("Motore" e "Motore acceso") che mostravano la stessa identica informazione: ne resta una sola
+  ("Motore"), quella storica. Nessuna funzione persa, solo un po' di ordine in più.
+- **Diagnosi più precisa quando un comando viene rifiutato per il PIN.** Quando l'auto non accetta
+  il codice di sicurezza dei comandi, ora l'integrazione **mostra e registra il codice esatto**
+  restituito dal server. Serve a distinguere con certezza un vero "PIN sbagliato" da altre cause
+  (permessi del veicolo, problema temporaneo del server): utile se, dopo aver corretto il PIN, i
+  comandi continuassero a non partire.
+
 ## v1.5.24 — 2026-07-06
+
+### 🇬🇧 English
+
+- **Fixed the nastiest problem: commands that looked successful while the car did nothing.** If the
+  **4-digit remote-command PIN** is wrong, the car rejects every command — but until now the switch
+  in Home Assistant stayed on "done" and everything looked fine (while windows, climate, lock, etc.
+  didn't move). Now, in this case, **the switch snaps back to its real state** and a clear message
+  appears: **"Wrong command PIN"**.
+- **You can fix the PIN without deleting and re-adding the integration.** A Home Assistant **repair**
+  notice appears (Settings → the usual banner at the top) that, with one click, lets you **enter the
+  correct PIN** and sorts everything out. Alternatively you'll find the same under **Settings →
+  Devices & services → Omoda 9 → Reconfigure**. No email code is needed: the command PIN has nothing
+  to do with logging in. (Tip: don't keep retrying with a wrong PIN, to avoid locking the account.)
+- **If your session expires (which happens if you open the official phone app) it now tells you
+  clearly.** Previously the only way to restore the session was to hunt for "hidden" buttons; now
+  Home Assistant shows the standard **"Re-authentication required"** notice: click it, get a **code
+  by email**, enter it — and the data comes back. The old OTP buttons remain available as a fallback.
 
 ### 🇮🇹 Italiano
 
@@ -634,24 +661,34 @@ update) come from **JackRonan**'s work on his English fork, and were ported back
   **codice via email** e lo inserisci — e i dati tornano. I vecchi pulsanti OTP restano comunque
   disponibili come riserva.
 
+## v1.5.23 — 2026-07-06
+
 ### 🇬🇧 English
 
-- **Fixed the nastiest problem: commands that looked successful while the car did nothing.** If the
-  **4-digit remote-command PIN** is wrong, the car rejects every command — but until now the switch
-  in Home Assistant stayed on "done" and everything looked fine (while windows, climate, lock, etc.
-  didn't move). Now, in this case, **the switch snaps back to its real state** and a clear message
-  appears: **"Wrong command PIN"**.
-- **You can fix the PIN without deleting and re-adding the integration.** A Home Assistant **repair**
-  notice appears (Settings → the usual banner at the top) that, with one click, lets you **enter the
-  correct PIN** and sorts everything out. Alternatively you'll find the same under **Settings →
-  Devices & services → Omoda 9 → Reconfigure**. No email code is needed: the command PIN has nothing
-  to do with logging in. (Tip: don't keep retrying with a wrong PIN, to avoid locking the account.)
-- **If your session expires (which happens if you open the official phone app) it now tells you
-  clearly.** Previously the only way to restore the session was to hunt for "hidden" buttons; now
-  Home Assistant shows the standard **"Re-authentication required"** notice: click it, get a **code
-  by email**, enter it — and the data comes back. The old OTP buttons remain available as a fallback.
-
-## v1.5.23 — 2026-07-06
+- **Battery and mileage stay fresh even while the car is parked, and the car is "woken up" far less
+  than before.** We found that the car stays reachable from the cloud for hours after you use it:
+  during that window the integration reads battery, mileage, range and tyres **read-only, without
+  waking it**. So the wake-up (which slightly uses the 12V battery and can interfere with the
+  official phone app) now happens **only when actually needed** — i.e. when the car is genuinely
+  asleep; if it's already reachable, the data refreshes on its own with no wake-up at all. We also
+  added a new **"Car data updated"** indicator showing the time of the last data received from the
+  car, so you know how fresh what you see is. Driving detection was also improved (in some cases the
+  car looked stationary while actually moving). Everything strictly **read-only**.
+- **Switches no longer show a fake "done" when the car rejects the command.** If you send a
+  command (close, climate, lock…) while the car is already doing something else, it's busy and
+  won't run it: previously the switch stayed on as if it had succeeded, and you had to wait
+  several seconds before retrying. Now the switch **snaps back to its real state**, a clear notice
+  appears ("car busy, try again in a few seconds") and you can **retry right away**. The same
+  applies to the car's other rejections (feature not allowed on this vehicle, session needs
+  re-login): no more false "executed".
+- **New indicators and a more realistic total range.** Added four new live-verified indicators:
+  **Engine running**, **High voltage active**, **Low fuel warning** and **Charge needed warning**.
+  In exchange we removed a few indicators this vehicle simply doesn't transmit (they stayed
+  "unknown" forever and only caused confusion: cabin temperature, some trip odometers, charging
+  power, average speed, instant consumption, fast-charge times). Finally, **Total range** is now
+  computed as **electric + petrol** (it previously used a dashboard value that, verified in the
+  field, stayed fixed and didn't follow the charge) → the number shown is finally consistent with
+  the real battery and tank state.
 
 ### 🇮🇹 Italiano
 
@@ -682,34 +719,17 @@ update) come from **JackRonan**'s work on his English fork, and were ported back
   restava fisso e non seguiva la carica) → il numero mostrato è finalmente coerente con lo stato
   reale di batteria e serbatoio.
 
+## v1.5.22 — 2026-06-24
+
 ### 🇬🇧 English
 
-- **Battery and mileage stay fresh even while the car is parked, and the car is "woken up" far less
-  than before.** We found that the car stays reachable from the cloud for hours after you use it:
-  during that window the integration reads battery, mileage, range and tyres **read-only, without
-  waking it**. So the wake-up (which slightly uses the 12V battery and can interfere with the
-  official phone app) now happens **only when actually needed** — i.e. when the car is genuinely
-  asleep; if it's already reachable, the data refreshes on its own with no wake-up at all. We also
-  added a new **"Car data updated"** indicator showing the time of the last data received from the
-  car, so you know how fresh what you see is. Driving detection was also improved (in some cases the
-  car looked stationary while actually moving). Everything strictly **read-only**.
-- **Switches no longer show a fake "done" when the car rejects the command.** If you send a
-  command (close, climate, lock…) while the car is already doing something else, it's busy and
-  won't run it: previously the switch stayed on as if it had succeeded, and you had to wait
-  several seconds before retrying. Now the switch **snaps back to its real state**, a clear notice
-  appears ("car busy, try again in a few seconds") and you can **retry right away**. The same
-  applies to the car's other rejections (feature not allowed on this vehicle, session needs
-  re-login): no more false "executed".
-- **New indicators and a more realistic total range.** Added four new live-verified indicators:
-  **Engine running**, **High voltage active**, **Low fuel warning** and **Charge needed warning**.
-  In exchange we removed a few indicators this vehicle simply doesn't transmit (they stayed
-  "unknown" forever and only caused confusion: cabin temperature, some trip odometers, charging
-  power, average speed, instant consumption, fast-charge times). Finally, **Total range** is now
-  computed as **electric + petrol** (it previously used a dashboard value that, verified in the
-  field, stayed fixed and didn't follow the charge) → the number shown is finally consistent with
-  the real battery and tank state.
-
-## v1.5.22 — 2026-06-24
+- **Your car's data now updates by itself while you drive.** Until now, during a trip, values like
+  battery, distance travelled and range stayed frozen until you manually pressed the "Refresh full
+  status" button: a moving car doesn't send updates on its own. Now the integration notices this by
+  itself and, while you're driving, refreshes the data roughly every minute with no action from you.
+  When the car is parked or charging nothing changes compared to before. This is **read-only**: no
+  command is ever sent to the car and it doesn't drain the battery. It works with the "Automatic
+  update" switch turned on (as it already was).
 
 ### 🇮🇹 Italiano
 
@@ -722,26 +742,7 @@ update) come from **JackRonan**'s work on his English fork, and were ported back
   comando all'auto e non si consuma la batteria. Funziona con l'interruttore "Aggiornamento
   automatico" acceso (come già era).
 
-### 🇬🇧 English
-
-- **Your car's data now updates by itself while you drive.** Until now, during a trip, values like
-  battery, distance travelled and range stayed frozen until you manually pressed the "Refresh full
-  status" button: a moving car doesn't send updates on its own. Now the integration notices this by
-  itself and, while you're driving, refreshes the data roughly every minute with no action from you.
-  When the car is parked or charging nothing changes compared to before. This is **read-only**: no
-  command is ever sent to the car and it doesn't drain the battery. It works with the "Automatic
-  update" switch turned on (as it already was).
-
 ## v1.5.21 — 2026-06-23
-
-### 🇮🇹 Italiano
-
-- **Risolto: non si riusciva più ad aggiungere l'integrazione (errore "not_implemented").**
-  Chi installava l'integrazione da zero, alla voce **Aggiungi integrazione → Omoda 9 / Jaecoo**,
-  riceveva subito un errore "not_implemented" e non riusciva a inserire email e PIN. La schermata
-  di accesso non veniva proposta per niente. Ora la procedura di configurazione (email → codice
-  ricevuto via mail → eventuale scelta dell'auto) funziona di nuovo correttamente. Chi aveva già
-  configurato l'integrazione in precedenza non era interessato dal problema.
 
 ### 🇬🇧 English
 
@@ -751,6 +752,15 @@ update) come from **JackRonan**'s work on his English fork, and were ported back
   screen wasn't shown at all. The setup process (email → code received by mail → optional vehicle
   selection) now works correctly again. Anyone who had already configured the integration was not
   affected by this problem.
+
+### 🇮🇹 Italiano
+
+- **Risolto: non si riusciva più ad aggiungere l'integrazione (errore "not_implemented").**
+  Chi installava l'integrazione da zero, alla voce **Aggiungi integrazione → Omoda 9 / Jaecoo**,
+  riceveva subito un errore "not_implemented" e non riusciva a inserire email e PIN. La schermata
+  di accesso non veniva proposta per niente. Ora la procedura di configurazione (email → codice
+  ricevuto via mail → eventuale scelta dell'auto) funziona di nuovo correttamente. Chi aveva già
+  configurato l'integrazione in precedenza non era interessato dal problema.
 
 ## v1.5.20 — 2026-06-23
 
