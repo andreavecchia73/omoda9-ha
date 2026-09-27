@@ -106,3 +106,22 @@ def test_la_tabella_generata_e_allineata_ai_rapporti():
                    check=True, capture_output=True)
     assert prima.read_text(encoding="utf-8") == vecchio, \
         "docs/tested-models.md non e' allineata: lancia tools/build_models_table.py"
+
+
+def test_un_vin_nel_nome_del_file_non_passa(tmp_path):
+    """Il controllo sul contenuto da solo e' monco, e lo ha notato un tester prima che
+    costasse a qualcuno: la diagnostica redige cio' che sta DENTRO il file, e nessuno guarda
+    come si chiama. Il nome di un file committato sta nella storia di git esattamente come
+    il suo contenuto."""
+    import validate_report
+    f = tmp_path / "omoda9-LNNABDCX3TD024097-report.json"
+    f.write_text(json.dumps(_buono()), encoding="utf-8")
+    problemi = validate_report.valida(f)
+    assert any("NOME del file" in p for p in problemi), problemi
+
+
+def test_un_nome_di_file_pulito_passa(tmp_path):
+    import validate_report
+    f = tmp_path / "omoda-omoda-5-ev-it.json"
+    f.write_text(json.dumps(_buono()), encoding="utf-8")
+    assert validate_report.valida(f) == []
