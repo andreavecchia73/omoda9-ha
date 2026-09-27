@@ -25,12 +25,12 @@ from custom_components.omoda9.const import (
 # Ripartizione attesa, verificata dal vivo (v1.5.24, 2026-07-06 → 105 entità, 0 unavailable).
 # Modificare questi numeri è una DECISIONE: va fatto insieme al changelog e alle note.
 #
-# 2026-08-10 → 106: aggiunto `switch.omoda9_disappannamento_parabrezza` (disappannamento del
+# 2026-08-10 → 106: aggiunto `switch.chery_connect_windshield_defog` (disappannamento del
 # parabrezza dal clima, campo `fWinHeatingState`, voce di permesso 2045). È una entità IN PIÙ e
 # non una sostituzione: il campo NON è stato promosso a "ricco", proprio per non far sparire
-# `binary_sensor.omoda9_riscaldamento_parabrezza` lasciando un orfano `unavailable`.
+# `binary_sensor.chery_connect_windshield_heating` lasciando un orfano `unavailable`.
 #
-# 2026-08-10 → 107: aggiunto `sensor.omoda9_partenza_programmata`, lettura del piano di partenza
+# 2026-08-10 → 107: aggiunto `sensor.chery_connect_scheduled_departure`, lettura del piano di partenza
 # che l'auto ci manda già a ogni sonda (`appointmentTravelSetVOS`) e che finora buttavamo via.
 # Nessuna chiamata nuova verso il cloud: solo un campo che smettevamo di ignorare.
 ATTESO = {
@@ -145,7 +145,7 @@ async def test_conteggio_entita_reale(hass, integrazione_avviata):
     conteggio: dict[str, int] = {}
     for entity_id in hass.states.async_entity_ids():
         dominio, _, oggetto = entity_id.partition(".")
-        if oggetto.startswith("omoda9_"):
+        if oggetto.startswith("chery_connect_"):
             conteggio[dominio] = conteggio.get(dominio, 0) + 1
 
     differenze = {p: (conteggio.get(p, 0), ATTESO[p])
