@@ -80,7 +80,15 @@ def valida(percorso: Path) -> list[str]:
     except json.JSONDecodeError as err:
         return problemi + [f"non e' JSON valido: {err}"]
 
+    # Home Assistant INCAPSULA la diagnostica dell'integrazione sotto `data`, insieme alla
+    # sua (versione di HA, manifest, tempi di avvio). Il file che l'utente scarica e' quello
+    # incapsulato; quello che l'integrazione produce e' il contenuto. Si accettano entrambe
+    # le forme, perche' un rapporto puo' arrivare gia' estratto - e perche' cercare solo la
+    # radice ha respinto il primo rapporto vero dicendo che serviva una versione piu' nuova,
+    # che era falso e mandava la persona a rifare una cosa fatta bene.
     v = d.get("vehicle")
+    if not isinstance(v, dict) and isinstance(d.get("data"), dict):
+        v = d["data"].get("vehicle")
     if not isinstance(v, dict):
         return problemi + [
             "non ha la sezione `vehicle`. Serve una diagnostica di v1.14.0-beta.10 o "
@@ -128,13 +136,21 @@ def main(argv: list[str]) -> int:
     rotti = 0
     for f in file:
         problemi = valida(f)
+        # Path relativa quando si puo', assoluta quando no: questo script si usa anche a
+        # mano su un file appena scaricato, fuori dal repository, ed e' proprio il momento
+        # in cui serve di piu'. Prima esplodeva li', mentre stampava un problema - cioe'
+        # nascondeva il problema che aveva appena trovato.
+        try:
+            dove = f.relative_to(RADICE)
+        except ValueError:
+            dove = f
         if problemi:
             rotti += 1
-            print(f"::error file={f.relative_to(RADICE)}::{f.name}: " + problemi[0])
+            print(f"::error file={dove}::{f.name}: " + problemi[0])
             for p in problemi:
                 print(f"  - {p}")
         else:
-            print(f"ok  {f.relative_to(RADICE)}")
+            print(f"ok  {dove}")
     return 1 if rotti else 0
 
 
