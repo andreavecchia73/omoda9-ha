@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Omoda 9 / Jaecoo",
+        "title": "Chery Connect",
         "description": "Scegli come accedere al tuo account Omoda/Jaecoo. Usa l'opzione telefono se il tuo account è registrato con un numero di telefono invece che con un'email.",
         "menu_options": {
           "login_email": "Accedi con email",
@@ -77,7 +77,7 @@
         }
       },
       "reauth_confirm": {
-        "title": "Ri-autentica Omoda 9 / Jaecoo",
+        "title": "Ri-autentica Chery Connect",
         "description": "La sessione è scaduta: finché non riautentichi l'integrazione non riesce a parlare con l'auto e comandi e sensori restano fermi.\n\n**Nessun codice è stato inviato in automatico.** Scegli «Inviami un codice nuovo» per riceverne uno fresco a {email}.{reason}",
         "menu_options": {
           "send_code": "Inviami un codice nuovo",

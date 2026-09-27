@@ -1851,7 +1851,7 @@ class Omoda9Coordinator(DataUpdateCoordinator):
             testo = (
                 f"L'integrazione non riesce più a parlare con l'auto: comandi e sensori "
                 f"restano fermi finché non riautentichi.\n\n"
-                f"Vai su **Impostazioni → Dispositivi e servizi → Omoda 9 / Jaecoo → "
+                f"Vai su **Impostazioni → Dispositivi e servizi → Chery Connect → "
                 f"Riautentica** e scegli **«Inviami un codice nuovo»**: {self._dove_arriva_it()}.\n\n"
                 f"Nessun codice è stato inviato in automatico — parte solo se lo chiedi tu."
             )
@@ -1860,7 +1860,7 @@ class Omoda9Coordinator(DataUpdateCoordinator):
             testo = (
                 f"The integration can no longer talk to the car: commands and sensors "
                 f"stay frozen until you re-authenticate.\n\n"
-                f"Go to **Settings → Devices & services → Omoda 9 / Jaecoo → "
+                f"Go to **Settings → Devices & services → Chery Connect → "
                 f"Reconfigure/Re-authenticate** and pick **“Send me a new code”**: "
                 f"{self._dove_arriva_en()}.\n\n"
                 f"No code was sent automatically — one is only sent when you ask for it."
