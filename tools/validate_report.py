@@ -51,6 +51,19 @@ def _id_solo_termico() -> set[str]:
 def valida(percorso: Path) -> list[str]:
     """Ritorna l'elenco dei problemi. Vuoto = il rapporto passa."""
     problemi: list[str] = []
+
+    # 0. IL NOME DEL FILE. Il controllo sul contenuto da solo e' monco, e ce lo ha fatto
+    # notare un tester prima che costasse a qualcuno: la diagnostica redige quello che c'e'
+    # DENTRO, e nessuno guarda come si chiama il file. Chi lo rinomina a mano - o una
+    # versione di Home Assistant che componga il nome diversamente - puo' scriverci un VIN
+    # accanto a un contenuto perfettamente pulito. E il nome di un file committato sta nella
+    # storia di git esattamente come il suo contenuto.
+    if VIN.search(percorso.name) or EMAIL.search(percorso.name):
+        problemi.append(
+            f"ha un identificativo nel NOME del file ({percorso.name}). Il contenuto puo' "
+            "essere pulito e il nome no: rinominalo come dice reports/README.md, "
+            "`<marca>-<modello>-<regione>.json`.")
+
     testo = percorso.read_text(encoding="utf-8")
 
     # 1. Anti-fuga. Prima di tutto il resto: protegge chi ha caricato il file.
