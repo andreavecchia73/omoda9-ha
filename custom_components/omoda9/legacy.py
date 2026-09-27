@@ -261,3 +261,106 @@ def adotta(hass, entry, *, dry_run: bool = False) -> dict:
             rapporto["adottate"].append((vecchio_id, vecchio_id))
 
     return rapporto
+
+# ── Prese sul recorder ────────────────────────────────────────────────────────────────────
+# Tre funzioni di una riga, e non e' cerimonia: il recorder non esiste nell'ambiente di
+# test, quindi importandolo dentro `recupera_storico` quel codice non sarebbe verificabile
+# in nessun modo - e questa e' la funzione che tocca i dati storici della gente. Cosi' si
+# sostituiscono, e le tre righe che restano non hanno niente da sbagliare.
+
+async def _serie_esistenti(hass) -> set[str]:
+    from homeassistant.components.recorder.statistics import async_list_statistic_ids
+    return {m["statistic_id"] for m in await async_list_statistic_ids(hass)}
+
+
+def _rinomina_statistiche(hass, vecchio: str, nuovo: str) -> None:
+    from homeassistant.components.recorder.statistics import async_update_statistics_metadata
+    async_update_statistics_metadata(hass, vecchio, new_statistic_id=nuovo)
+
+
+def _cancella_statistiche(hass, ids: list[str]) -> None:
+    from homeassistant.components.recorder import get_instance
+    get_instance(hass).async_clear_statistics(ids)
+
+
+def _rinomina_cronologia(hass, vecchio: str, nuovo: str) -> None:
+    from homeassistant.components.recorder import get_instance
+    get_instance(hass).async_update_states_metadata(vecchio, new_entity_id=nuovo)
+
+
+async def recupera_storico(hass, entry, *, dry_run: bool = True) -> dict:
+    """Recupera i DATI della linea `omoda_jaecoo` quando le sue entita' non ci sono piu'.
+
+    Il caso che questa funzione copre e' l'errore che faranno quasi tutti, ed e' quello che
+    `adotta` non puo' piu' riparare: disinstallare la vecchia integrazione PRIMA di adottare.
+    "Rimuovi la vecchia" e' il primo passo che viene in mente a chiunque - tanto che il
+    documento di migrazione deve scrivere "solo allora" in grassetto, il che e' gia'
+    l'ammissione che l'ordine verra' sbagliato.
+
+    Cancellare un'integrazione toglie le entita' dal registro e NON tocca il recorder. I
+    dati restano, orfani, indicizzati sui vecchi `entity_id`; Home Assistant ricorda le
+    entita' cancellate in `deleted_entities`, con `entity_id` e `unique_id`, e questo basta
+    a ricostruire la corrispondenza. Quindi non si sposta piu' niente fra integrazioni: si
+    rinominano i dati addosso alle entita' nuove, che i nomi giusti ce li hanno gia'.
+
+    Due cose, separate perche' si perdono separatamente:
+      - le STATISTICHE a lungo termine (dashboard Energia, grafici a lunga memoria);
+      - la CRONOLOGIA degli stati.
+
+    C'e' un orologio: il purge del recorder prima o poi ripulisce le serie orfane. Giorni,
+    non ore, ma non e' per sempre.
+    """
+    from homeassistant.helpers import entity_registry as er
+
+    reg = er.async_get(hass)
+    vin = entry.data.get("vin") or ""
+    rapporto = {"statistiche": [], "cronologia": [], "saltate": [], "non_migrabili": []}
+    if not vin:
+        rapporto["saltate"].append(("-", "questo veicolo non ha un VIN nella configurazione"))
+        return rapporto
+
+    # Tutte le serie esistenti, una volta sola: serve sapere sia se la vecchia c'e' ancora
+    # sia se la nuova e' gia' occupata.
+    esistenti = await _serie_esistenti(hass)
+
+    for morta in reg.deleted_entities.values():
+        if morta.platform != LEGACY_DOMAIN:
+            continue
+        if not morta.unique_id.startswith(f"{vin}_"):
+            rapporto["saltate"].append((morta.entity_id, "e' di un altro veicolo"))
+            continue
+        piattaforma = morta.entity_id.split(".", 1)[0]
+        suffisso = morta.unique_id[len(vin) + 1:]
+        chiave = (piattaforma, suffisso)
+        if chiave in LEGACY_NOT_MIGRATABLE:
+            rapporto["non_migrabili"].append((morta.entity_id, LEGACY_NOT_MIGRATABLE[chiave]))
+            continue
+        nostro = LEGACY_SUFFIX_PAIRS.get(chiave, suffisso)
+        nuovo_id = CANON_ENTITY_ID.get((piattaforma, nostro))
+        if nuovo_id is None:
+            rapporto["saltate"].append((morta.entity_id, "nessun nome canonico per quel suffisso"))
+            continue
+
+        # STATISTICHE. Si agisce solo se la vecchia serie esiste ANCORA: e' cio' che rende
+        # questa funzione ripetibile. Dopo il primo giro la vecchia non c'e' piu' (e' stata
+        # rinominata), quindi un secondo giro non trova niente da fare invece di cancellare
+        # quello che ha appena recuperato.
+        if morta.entity_id in esistenti:
+            if nuovo_id in esistenti:
+                # La serie nuova esiste: sono le ore raccolte da quando l'integrazione nuova
+                # e' stata configurata, contro gli anni che stanno nella vecchia. Si libera
+                # il posto. E' l'unico punto in cui questa funzione cancella dei dati, e
+                # cancella sempre il lato piu' corto.
+                if not dry_run:
+                    _cancella_statistiche(hass, [nuovo_id])
+            if not dry_run:
+                _rinomina_statistiche(hass, morta.entity_id, nuovo_id)
+            rapporto["statistiche"].append((morta.entity_id, nuovo_id))
+
+        # CRONOLOGIA degli stati. Non passa dalle stesse tabelle e si perde per conto suo,
+        # quindi si tratta a parte: un'entita' puo' avere l'una senza l'altra.
+        if not dry_run:
+            _rinomina_cronologia(hass, morta.entity_id, nuovo_id)
+        rapporto["cronologia"].append((morta.entity_id, nuovo_id))
+
+    return rapporto

@@ -82,7 +82,7 @@ async def _async_register_adoption_service(hass: HomeAssistant) -> None:
     anche quando ha ragione, e questa gira su un'API che nessuna delle 1401 integrazioni di
     serie usa. Lo deve chiedere una persona, sapendo cosa comporta.
     """
-    from .legacy import LEGACY_DOMAIN, adotta
+    from .legacy import LEGACY_DOMAIN, adotta, recupera_storico
 
     if hass.services.has_service(DOMAIN, "adopt_legacy_entities"):
         return
@@ -113,6 +113,25 @@ async def _async_register_adoption_service(hass: HomeAssistant) -> None:
                 _LOGGER.warning("Omoda9 adozione: %s saltata - %s", vecchio, motivo)
 
     hass.services.async_register(DOMAIN, "adopt_legacy_entities", _esegui)
+
+    async def _recupera(call) -> None:
+        """Il caso di chi ha gia' disinstallato la vecchia: le entita' non ci sono piu', i
+        dati si'. Non serve che l'integrazione vecchia esista, ne' che sia spenta."""
+        dry = call.data.get("dry_run", True)
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            r = await recupera_storico(hass, entry, dry_run=dry)
+            _LOGGER.warning(
+                "Omoda9 recupero storico%s: %d serie statistiche, %d cronologie, "
+                "%d non migrabili, %d saltate",
+                " (prova a vuoto)" if dry else "",
+                len(r["statistiche"]), len(r["cronologia"]),
+                len(r["non_migrabili"]), len(r["saltate"]))
+            for vecchio, nuovo in r["statistiche"]:
+                _LOGGER.warning("Omoda9 recupero: statistiche %s -> %s", vecchio, nuovo)
+            for vecchio, motivo in r["non_migrabili"] + r["saltate"]:
+                _LOGGER.warning("Omoda9 recupero: %s non recuperata - %s", vecchio, motivo)
+
+    hass.services.async_register(DOMAIN, "recover_legacy_history", _recupera)
 
 
 async def _async_migrate_entity_ids(hass: HomeAssistant, entry: ConfigEntry) -> None:
