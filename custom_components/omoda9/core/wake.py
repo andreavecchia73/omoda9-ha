@@ -32,6 +32,19 @@ from . import codes
 _LOGGER = logging.getLogger(__name__)
 
 
+def _regione(ctx):
+    """I parametri di REGIONE effettivamente usati, non quelli che l'utente crede di avere
+    scelto. Sono configurazione, non dati personali: host del gateway, tenant, paese, canale
+    e lingua. Senza questa riga, per sapere su quale tenant stava bussando un'installazione
+    che non entra bisogna CHIEDERLO alla persona - ed e' esattamente cio' che e' successo
+    sulla #62, a tre utenti in tre paesi."""
+    try:
+        return (f"bff={ctx.bff} tenant={ctx.tenant_code} country={ctx.country_id} "
+                f"channel={ctx.channel_id} lang={ctx.language}")
+    except Exception:  # noqa: BLE001 - contesti ridotti nei test e nella diagnostica
+        return "regione non leggibile dal contesto"
+
+
 def _chiavi(o):
     """Le CHIAVI di un payload, mai i valori. Un body d'errore dice quasi tutto con la sua
     forma, e i valori possono portarsi dietro un token o l'identita' dell'account."""
@@ -253,8 +266,9 @@ def _bff_login(ctx, _allow_refresh=True):
         # la gente allega alle issue pubbliche.
         _LOGGER.warning(
             "Omoda9 login BFF: HTTP %s con un corpo non-JSON (%s, %d byte). "
-            "Sessione trattata come non valida.",
-            r.status_code, r.headers.get("content-type", "senza content-type"), len(r.content or b""))
+            "Sessione trattata come non valida. [%s]",
+            r.status_code, r.headers.get("content-type", "senza content-type"),
+            len(r.content or b""), _regione(ctx))
         _LOGGER.debug("Omoda9 login BFF: corpo non-JSON: %s", (r.text or "")[:300])
         return None, None
     d = j.get("data", {}) if isinstance(j, dict) else None
@@ -268,13 +282,23 @@ def _bff_login(ctx, _allow_refresh=True):
         # vuoto arrivano all'utente come la stessa identica frase. `code` e' il codice
         # d'errore del server, non un dato personale; il `message` resta a DEBUG.
         _LOGGER.warning(
-            "Omoda9 login BFF: HTTP %s rifiutato, code=%s, nessun userToken (data: %s). "
-            "Rinnovo automatico: %s.",
-            r.status_code, _code_of(j), _chiavi(d),
-            "lo provo" if _allow_refresh else "gia' provato, non ritento")
+            "Omoda9 login BFF: HTTP %s rifiutato, code=%s, nessun userToken (data: %s). [%s]",
+            r.status_code, _code_of(j), _chiavi(d), _regione(ctx))
         _LOGGER.debug("Omoda9 login BFF: message=%s", str(j.get("message"))[:200] if isinstance(j, dict) else "-")
-        # sessione scaduta: prova UN rinnovo automatico del token e ritenta una sola volta
-        if _allow_refresh and _refresh_token(ctx):
+        # sessione scaduta: prova UN rinnovo automatico del token e ritenta una sola volta.
+        # `_refresh_token` e' il wrapper booleano di `_refresh_token_detail`, che ha gia' il
+        # marcatore stabile del PERCHE' ("assente" / "rete:<Tipo>" / "rifiutato:<key>" /
+        # "risposta"). Usarlo e buttare il motivo sarebbe lo stesso difetto corretto in #68,
+        # un piano piu' sotto. Su un PRIMO login il motivo atteso e' "assente": leggerne un
+        # altro dice che il flusso e' arrivato dove non doveva.
+        if not _allow_refresh:
+            _LOGGER.warning("Omoda9 login BFF: rinnovo gia' tentato in questo giro, non ritento.")
+            return None, None
+        rinnovato, motivo = _refresh_token_detail(ctx)
+        _LOGGER.warning("Omoda9 login BFF: rinnovo automatico %s%s.",
+                        "riuscito" if rinnovato else "non riuscito",
+                        "" if rinnovato else f" ({motivo or 'senza motivo'})")
+        if rinnovato:
             return _bff_login(ctx, _allow_refresh=False)
         return None, None
     return ut, d.get("tUserId")
