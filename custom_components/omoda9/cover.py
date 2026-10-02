@@ -33,7 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, add: AddEnt
                     ["frontLeftWindowState", "frontRightWindowState",
                      "backLeftWindowState", "backRightWindowState"],
                     "finestrini_apri", "finestrini_chiudi", CoverDeviceClass.WINDOW, "mdi:car-door"),
-                Omoda9Cover(coord, "Omoda9 Tetto", "tetto", ["sunroofState"],
+        Omoda9Cover(coord, "Omoda9 Tetto", "tetto", ["sunroofState"],
                     "tetto_apri", "tetto_chiudi", CoverDeviceClass.SHADE, "mdi:car-select",
                     tilt_cmd="tetto_ventila"),
     ])
@@ -47,7 +47,7 @@ class Omoda9Cover(Omoda9OptimisticMixin, Omoda9Entity, CoverEntity, RestoreEntit
 
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
 
-        def __init__(self, coord, name, suffix, keys, open_cmd, close_cmd, dclass, icon,
+    def __init__(self, coord, name, suffix, keys, open_cmd, close_cmd, dclass, icon,
                  tilt_cmd: str | None = None) -> None:
         super().__init__(coord, name, suffix, entity_id_format=ENTITY_ID_FORMAT)
         self._keys = keys
@@ -92,7 +92,7 @@ class Omoda9Cover(Omoda9OptimisticMixin, Omoda9Entity, CoverEntity, RestoreEntit
 
     async def async_close_cover(self, **kwargs) -> None:
         await self._run_command(self._close_cmd, True)
-    
+
     async def async_open_cover_tilt(self, **kwargs) -> None:
         if self._tilt_cmd is None:
             return
