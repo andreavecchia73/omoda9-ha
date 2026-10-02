@@ -33,8 +33,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, add: AddEnt
                     ["frontLeftWindowState", "frontRightWindowState",
                      "backLeftWindowState", "backRightWindowState"],
                     "finestrini_apri", "finestrini_chiudi", CoverDeviceClass.WINDOW, "mdi:car-door"),
-        Omoda9Cover(coord, "Omoda9 Tetto", "tetto", ["sunroofState"],
-                    "tetto_apri", "tetto_chiudi", CoverDeviceClass.SHADE, "mdi:car-select"),
+                Omoda9Cover(coord, "Omoda9 Tetto", "tetto", ["sunroofState"],
+                    "tetto_apri", "tetto_chiudi", CoverDeviceClass.SHADE, "mdi:car-select",
+                    tilt_cmd="tetto_ventila"),
     ])
 
 
@@ -46,12 +47,21 @@ class Omoda9Cover(Omoda9OptimisticMixin, Omoda9Entity, CoverEntity, RestoreEntit
 
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
 
-    def __init__(self, coord, name, suffix, keys, open_cmd, close_cmd, dclass, icon) -> None:
+        def __init__(self, coord, name, suffix, keys, open_cmd, close_cmd, dclass, icon,
+                 tilt_cmd: str | None = None) -> None:
         super().__init__(coord, name, suffix, entity_id_format=ENTITY_ID_FORMAT)
         self._keys = keys
         self._opt_keys = tuple(keys)   # chiudono l'ottimismo solo i campi di QUESTA cover
         self._open_cmd = open_cmd
         self._close_cmd = close_cmd
+        # Optional tilt/vent command (sunroof only). Closing from the tilt position is the
+        # ordinary close command: the car has no separate "close tilt".
+        self._tilt_cmd = tilt_cmd
+        if tilt_cmd is not None:
+            self._attr_supported_features = (
+                CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
+                | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.CLOSE_TILT
+            )
         self._attr_device_class = dclass
         self._attr_icon = icon
         self._restored: bool | None = None  # True = chiuso
@@ -81,4 +91,14 @@ class Omoda9Cover(Omoda9OptimisticMixin, Omoda9Entity, CoverEntity, RestoreEntit
         await self._run_command(self._open_cmd, False)  # non chiuso = aperto
 
     async def async_close_cover(self, **kwargs) -> None:
+        await self._run_command(self._close_cmd, True)
+    
+    async def async_open_cover_tilt(self, **kwargs) -> None:
+        if self._tilt_cmd is None:
+            return
+        await self._run_command(self._tilt_cmd, False)  # tilted = not closed
+
+    async def async_close_cover_tilt(self, **kwargs) -> None:
+        if self._tilt_cmd is None:
+            return
         await self._run_command(self._close_cmd, True)
