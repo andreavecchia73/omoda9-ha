@@ -20,12 +20,12 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 
 ### 🇬🇧 English
 
-- **The sunroof can now be tilted, not only opened or closed.** The sunroof card gains the
-  tilt buttons: "open tilt" moves the sunroof to the tilt / vent position, "close tilt"
-  closes it. Full open and close work as before, and no new entity is added. *The command
-  was found and tested on a Jaecoo 7 PHEV by the person who reported it; this change has not
+- **New "Vent sunroof" button: the sunroof can now be tilted, not only opened or closed.**
+  It works like "Vent windows": one press moves the sunroof to the tilt / vent position, and
+  the usual close on the sunroof card brings it back down. Full open and close are
+  unchanged. This adds one entity, `button.chery_connect_vent_sunroof`. *The command was
+  found and tested on a Jaecoo 7 PHEV by the person who reported it; this change has not
   yet been tried on other models.*
-
 - **"Petrol range (miles)" now works out for itself which unit the car is speaking.** It is
   a diagnostic sensor, and until now it assumed that reading arrived in miles — true on the
   Omoda 9, but worked out from two readings of a single car. On a model sending kilometres
@@ -101,12 +101,12 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 
 ### 🇮🇹 Italiano
 
-- **Il tetto ora si può anche inclinare, non solo aprire o chiudere.** La card del tetto
-  ha in più i pulsanti di inclinazione: «apri inclinazione» porta il tetto in posizione
-  inclinata / ventilazione, «chiudi inclinazione» lo richiude. Apertura e chiusura complete
-  funzionano come prima e non si aggiunge nessuna entità. *Il comando è stato trovato e
-  provato su una Jaecoo 7 PHEV da chi l'ha segnalato; su altri modelli non è ancora stato
-  provato.*
+- **Nuovo pulsante «Ventila tetto»: il tetto ora si può anche inclinare, non solo aprire o
+  chiudere.** Funziona come «Ventila finestrini»: una pressione porta il tetto in posizione
+  inclinata / ventilazione, e la normale chiusura della card del tetto lo richiude. Apertura
+  e chiusura complete non cambiano. Si aggiunge un'entità, `button.chery_connect_vent_sunroof`.
+  *Il comando è stato trovato e provato su una Jaecoo 7 PHEV da chi l'ha segnalato; su altri
+  modelli non è ancora stato provato.*
 
 - **«Autonomia benzina (miglia)» ora capisce da sola in che unità parla l'auto.** È un
   sensore di diagnostica, e finora dava per scontato che quel dato arrivasse in miglia —
