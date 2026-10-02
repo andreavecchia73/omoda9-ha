@@ -32,6 +32,10 @@ COMMANDS_AS_RICH_ENTITY = {
     "baule_apri", "baule_chiudi",
     "finestrini_apri", "finestrini_chiudi",
     "tetto_apri", "tetto_chiudi",
+
+   # sunroof tilt is driven by the sunroof cover (open_cover_tilt) → no extra button
+    "tetto_ventila",
+  
     # comfort: ogni funzione è uno switch (ON+OFF) → niente pulsanti singoli
     "defrost_parabrezza", "defrost_parabrezza_off",
     "disappanna_parabrezza", "disappanna_parabrezza_off",
