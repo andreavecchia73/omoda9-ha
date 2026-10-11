@@ -93,6 +93,8 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 
 - **Three sensors that only exist on a battery-electric car kept their old Italian names, and had no translation at all.** Charging power, WLTP range and electric efficiency are created only once the car has confirmed it is battery-only, which happens after the first setup - so they were not present when the renaming table was built, and they were never in the translation files either. They now have English ids like everything else, and a name in every language. If you have them, they are renamed automatically at the next start, and your history follows.
 
+- **Internal: the integration no longer asks to install `requests` and `pillow`.** Home Assistant already ships both, and its validator now rejects a custom integration that lists them, which would have blocked this release. Nothing changes on your installation: the integration uses the copies Home Assistant already has.
+
 ### 🇮🇹 Italiano
 
 - **«Autonomia benzina (miglia)» ora capisce da sola in che unità parla l'auto.** È un
@@ -167,6 +169,8 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 - **Il recupero della cronologia adesso la sposta davvero.** Il tentativo precedente cercava di togliere di mezzo la cronologia piu' corta con il purge del recorder, e non funziona: il purge cancella gli stati ma lascia la riga che blocca la rinomina, quindi tutte le entita' fallivano con `already in use` e il rapporto diceva di avercela fatta. Adesso la cronologia corta viene spostata di lato sotto un nome parcheggio invece che cancellata: funziona e non distrugge niente. Se avevi gia' lanciato il recupero, rilancialo.
 
 - **Tre sensori che esistono solo su un'auto elettrica erano rimasti coi vecchi nomi italiani, e non avevano nessuna traduzione.** Potenza di ricarica, autonomia WLTP ed efficienza elettrica nascono solo dopo che l'auto ha confermato di essere solo elettrica, cosa che avviene a configurazione gia' fatta: non c'erano nella tabella dei nomi, e nei file di traduzione non c'erano mai stati. Adesso hanno identificativi inglesi come tutto il resto e un nome in ogni lingua. Se li hai, vengono rinominati da soli al prossimo avvio e lo storico li segue.
+
+- **Lavoro interno: l'integrazione non chiede piu' di installare `requests` e `pillow`.** Home Assistant li include gia' entrambi, e il suo validatore adesso rifiuta un'integrazione custom che li elenca, cosa che avrebbe bloccato questo rilascio. Sulla tua installazione non cambia niente: l'integrazione usa le copie che Home Assistant ha gia'.
 
 ## v1.13.0 — 2026-08-10
 
