@@ -16,6 +16,20 @@ dell'integrazione: aggiorna da **HACS → Omoda 9 / Jaecoo → Aggiorna**.
 
 ## [Non rilasciato]
 
+### 🇬🇧 English
+
+- **"Fuel remaining" is now shown as a percentage, not in litres.** The car sends this
+  value as a percentage of the tank, but it was labelled as litres. The sensor
+  `sensor.chery_connect_fuel_remaining` now uses `%`. Its entity ID does not change. Past
+  history recorded in litres may show a unit change in Home Assistant statistics.
+
+### 🇮🇹 Italiano
+
+- **"Carburante residuo" ora è mostrato in percentuale, non in litri.** L'auto invia questo
+  valore come percentuale del serbatoio, ma era etichettato come litri. Il sensore
+  `sensor.chery_connect_fuel_remaining` ora usa `%`. L'ID dell'entità non cambia. Lo storico
+  registrato in litri può mostrare un cambio di unità nelle statistiche di Home Assistant.
+
 ## v1.14.0 — 2026-08-24
 
 ### 🇬🇧 English
