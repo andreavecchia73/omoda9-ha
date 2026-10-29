@@ -51,7 +51,7 @@ from .entity import Omoda9Entity, in_zona_casa
 # Valori/unità CONFERMATI dal vivo ad auto sveglia (2026-06-21, 84 campi):
 #   pureElectricRange=60 km · mileageSurplus=215 km (benzina) · cruiseRange=134 (=215 km in miglia)
 #   lFrontTyreKpa=292 (=42 psi) → kPa · gomme temp 34-35 °C · *TyreCall/socLowCall=0=ok
-#   oilSurplus=23 → LITRI (215−60=155 km a benzina /23 L ≈ 15 L/100km) · averageFuel=0.0
+#   oilSurplus=23 → PERCENTUALE di serbatoio (segnalato dal campo su J7 PHEV) · averageFuel=0.0
 #   avgHkPowerKwh50km=20.6 → kWh/100km · totalVoltage=323.1 V · totalCurrent=0.0 A (HV reali!)
 #   remainChargeTime ASSENTE ad auto non in carica (comparirà sotto carica).
 
@@ -334,9 +334,10 @@ _RT_SENSORS: list[_RtSpec] = [
     _RtSpec("consumo_elettrico", "Consumo medio elettrico",
             ("avgHkPowerKwh50km", "avgHkPower"),
             None, "kWh/100 km", MEAS, "mdi:lightning-bolt", invalid=(-100.0,)),
-    # oilSurplus=23 dal vivo → LITRI (confermato dal calcolo autonomia benzina).
+    # oilSurplus=23 dal vivo → PERCENTUALE del serbatoio, non litri (segnalato su Jaecoo J7
+    # PHEV; la vecchia ipotesi "litri" era un calcolo circolare sull'autonomia benzina).
     _RtSpec("carburante_residuo", "Carburante residuo", "oilSurplus",
-            None, "L", MEAS, "mdi:fuel"),
+            None, PERCENTAGE, MEAS, "mdi:fuel"),
     # ── P2 · batteria alta tensione (valide SOLO ad auto in marcia/ricarica) ──
     # Da ferma l'auto manda 0 V / -1000 A = segnaposto "HV spenta", non letture reali:
     # marcati invalidi → il sensore tiene l'ultimo valore noto invece di azzerarsi.
